@@ -33,11 +33,11 @@ defmodule SimpleHttp.Mixfile do
   defp package do
     [# These are the default files included in the package
       name: :simplehttp,
+      description: "HTTP client for Elixir without dependencies",
       files: ["lib", "config", "priv", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
       maintainers: ["Bagu Alexandru Bogdan"],
       licenses: ["Apache 2.0"],
-      links: %{"GitHub" => "https://github.com/alexandrubagu/simplehttp", "Docs" => "https://github.com/alexandrubagu/simplehttp", "Website" => "http://www.alexandrubagu.info" }
-    ]
+      links: %{"GitHub" => "https://github.com/alexandrubagu/simplehttp", "Docs" => "https://github.com/alexandrubagu/simplehttp", "Website" => "http://www.alexandrubagu.info" }]
   end
 
 end
