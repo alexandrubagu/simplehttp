@@ -26,27 +26,57 @@
 $ iex -S mix
 ```
 
-*Note* Before you start to make a request you need to start inet, this can be do calling this function:
+*Note* **Before you start to make a request you need to start inet, this can be do calling this function:**
 
 ```elixir
 SimpleHttp.start
 ```
 
-Some basic examples:
-
+Simple GET Request
 ```elixir
     {:ok, response} = SimpleHttp.get "http://jsonplaceholder.typicode.com/posts/1"
 
+    IO.inspect response.status 
+    ~s"""
+        {'HTTP/1.1', 200, 'OK'}
+    """
+
+    IO.inspect response.headers
+    ~s"""
+   		[{'cache-control', 'public, max-age=14400'}, {'connection', 'keep-alive'},
+		 {'content-length', '292'}, {'content-type', 'application/json; charset=utf-8'},
+		 {'expires', 'Wed, 31 Aug 2016 22:15:00 GMT'},
+		 {'set-cookie',
+		  '__cfduid=d428f11c1dd124bd8f57108706ddb5ca61472667300; expires=Thu, 31-Aug-17 18:15:00 GMT; path=/; domain=.typicode.com; HttpOnly'},
+		 {'cf-ray', '2db27722e62f0479-FRA'}] 
+    """   
+
+    IO.puts response.body
+	~s"""
+		{
+		  "userId": 1,
+		  "id": 1,
+		  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+		  "body": "bla bla"
+		}
+	"""
+
 ```
 
+GET Request with query params
 ```elixir
     {:ok, response} = SimpleHttp.get "http://jsonplaceholder.typicode.com/posts/1", [
       query_params: [
         postId: 1
       ]
     ]
+
+    IO.inspect response.status 
+    IO.inspect response.headers
+    IO.puts response.body
 ```
 
+POST with JSON
 ```elixir
     {:ok, response} = SimpleHttp.post "http://jsonplaceholder.typicode.com/posts", [
       body: "{\"name\":\"foo.example.com\"}",
@@ -54,8 +84,13 @@ Some basic examples:
       timeout: 1000,
       connect_timeout: 1000
     ]
+
+    IO.inspect response.status 
+    IO.inspect response.headers
+    IO.puts response.body
 ```
 
+POST with params
 ```elixir
     {:ok, response} = SimpleHttp.post "http://jsonplaceholder.typicode.com/posts", [
       params: [
@@ -66,4 +101,8 @@ Some basic examples:
       timeout: 1000,
       connect_timeout: 1000
     ]
+
+    IO.inspect response.status 
+    IO.inspect response.headers
+    IO.puts response.body
 ```
