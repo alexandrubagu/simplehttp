@@ -31,7 +31,7 @@ httpotion
 
 2. [edgurgel/httpoison](https://github.com/edgurgel/httpoison)
 
-**BUILD FAILED** **BUILD FAILED** **BUILD FAILED**
+**BUILD FAILED**
 
 ```
 Erlang/OTP 19 [erts-8.0] [source] [64-bit] [smp:4:4] [async-threads:10] [kernel-poll:false]

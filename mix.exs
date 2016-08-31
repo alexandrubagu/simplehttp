@@ -29,4 +29,15 @@ defmodule SimpleHttp.Mixfile do
   defp deps do
     []
   end
+
+  defp package do
+    [# These are the default files included in the package
+      name: :simplehttp,
+      files: ["lib", "config", "priv", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
+      maintainers: ["Bagu Alexandru Bogdan"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/alexandrubagu/simplehttp", "Docs" => "https://github.com/alexandrubagu/simplehttp", "Website" => "http://www.alexandrubagu.info" }
+    ]
+  end
+
 end
