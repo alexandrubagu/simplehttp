@@ -4,6 +4,7 @@
 
 ####**Unlike other projects / libraries, SimpleHttp doesn't have other dependencies**
 
+[alexandrubagu/simplehttp]https://github.com/alexandrubagu/simplehttpn) 
 ```
 $ mix app.tree
 
@@ -12,6 +13,47 @@ simplehttp
 └── logger
     └── elixir
 ```
+
+###For example:
+1. [myfreeweb/httpotion](https://github.com/myfreeweb/httpotion) 
+```
+$ mix app.tree                          
+
+httpotion
+├── elixir
+├── ssl
+│   ├── crypto
+│   └── public_key
+│       ├── asn1
+│       └── crypto
+└── ibrowse
+```
+
+2. [edgurgel/httpoison](https://github.com/edgurgel/httpoison)
+
+**BUILD FAILED** **BUILD FAILED** **BUILD FAILED**
+
+```
+Erlang/OTP 19 [erts-8.0] [source] [64-bit] [smp:4:4] [async-threads:10] [kernel-poll:false]
+
+===> Compiling ssl_verify_fun
+===> Compiling src/ssl_verify_hostname.erl failed
+src/ssl_verify_hostname.erl:8: can't find include lib "public_key/include/public_key.hrl"
+src/ssl_verify_hostname.erl:102: undefined macro 'id-ce-subjectAltName'
+
+src/ssl_verify_hostname.erl:79: record 'AttributeTypeAndValue' undefined
+src/ssl_verify_hostname.erl:81: variable 'CN' is unbound
+src/ssl_verify_hostname.erl:94: variable 'ExtId' is unbound
+src/ssl_verify_hostname.erl:94: record 'Extension' undefined
+src/ssl_verify_hostname.erl:242: record 'OTPTBSCertificate' undefined
+src/ssl_verify_hostname.erl:255: record 'OTPCertificate' undefined
+src/ssl_verify_hostname.erl:257: function extract_dns_names/1 undefined
+
+src/ssl_verify_hostname.erl:87: Warning: function extensions_list/1 is unused
+src/ssl_verify_hostname.erl:93: Warning: function select_extension/2 is unused
+src/ssl_verify_hostname.erl:110: Warning: function extract_dns_names_from_alt_names/2 is unused
+```
+
 
 ## Hex Installation 
 
