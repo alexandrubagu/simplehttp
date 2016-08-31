@@ -1,6 +1,6 @@
 # SimpleHttp
 
-[![Travis](https://travis-ci.org/alexandrubagu/simplehttp.svg?branch=master)](https://travis-ci.org/alexandrubagu/simplehttp)
+[![Travis](https://travis-ci.org/alexandrubagu/simplehttp.svg)](https://travis-ci.org/alexandrubagu/simplehttp)
 
 ## Installation
 
