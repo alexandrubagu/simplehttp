@@ -1,5 +1,16 @@
 # SimpleHttp [![Travis](https://travis-ci.org/alexandrubagu/simplehttp.svg)](https://travis-ci.org/alexandrubagu/simplehttp)
 
+** Unlike other projects / libraries, SimpleHttp doesn't have other dependencies **
+
+```
+$ mix app.tree
+
+simplehttp
+├── elixir
+└── logger
+    └── elixir
+```
+
 ## Hex Installation 
 
   1. Add `simplehttp` to your list of dependencies in `mix.exs`:
