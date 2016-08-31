@@ -4,7 +4,6 @@
 
 ####**Unlike other projects / libraries, SimpleHttp doesn't have other dependencies**
 
-[alexandrubagu/simplehttp]https://github.com/alexandrubagu/simplehttpn) 
 ```
 $ mix app.tree
 
