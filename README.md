@@ -1,6 +1,6 @@
 # SimpleHttp
 
-**TODO: Add description**
+[![Travis](https://travis-ci.org/alexandrubagu/simplehttp.svg?branch=master)](https://travis-ci.org/alexandrubagu/simplehttp)
 
 ## Installation
 
