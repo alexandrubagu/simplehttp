@@ -1,6 +1,8 @@
 # SimpleHttp [![Travis](https://travis-ci.org/alexandrubagu/simplehttp.svg)](https://travis-ci.org/alexandrubagu/simplehttp)
 
-** Unlike other projects / libraries, SimpleHttp doesn't have other dependencies **
+## Description
+
+####**Unlike other projects / libraries, SimpleHttp doesn't have other dependencies**
 
 ```
 $ mix app.tree
