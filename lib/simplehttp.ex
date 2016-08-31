@@ -28,7 +28,11 @@ defmodule SimpleHttp do
     Before you use this module you SHOULD call SimpleHttp.start
   """
   def start do
-    :inets.start
+    case :inets.start do
+      {:ok} -> :ok
+      {:error, {:already_started, _}} -> :ok
+      {:error, _} -> :error
+    end
   end
 
   defp execute(request) do
