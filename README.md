@@ -47,7 +47,7 @@ Simple GET Request
 		 {'content-length', '292'}, {'content-type', 'application/json; charset=utf-8'},
 		 {'expires', 'Wed, 31 Aug 2016 22:15:00 GMT'},
 		 {'set-cookie',
-		  '__cfduid=d428f11c1dd124bd8f57108706ddb5ca61472667300; expires=Thu, 31-Aug-17 18:15:00 GMT; path=/; domain=.typicode.com; HttpOnly'},
+		  '__cfduid=d42; expires=Thu, 31-Aug-17 18:15:00 GMT; path=/; domain=.typicode.com; HttpOnly'},
 		 {'cf-ray', '2db27722e62f0479-FRA'}] 
     """   
 
