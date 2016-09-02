@@ -14,7 +14,7 @@ simplehttp
 ```
 
 ###Other libraries:
-1. Dependencies tree for [myfreeweb/httpotion](https://github.com/myfreeweb/httpotion) 
+Dependencies tree for [myfreeweb/httpotion](https://github.com/myfreeweb/httpotion) 
 ```
 $ mix app.tree                          
 
@@ -28,7 +28,7 @@ httpotion
 └── ibrowse
 ```
 
-2. Dependencies tree for [edgurgel/httpoison](https://github.com/edgurgel/httpoison)
+Dependencies tree for [edgurgel/httpoison](https://github.com/edgurgel/httpoison)
 ```
 $ mix app.tree                          
 
