@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Simplehttp by alexandrubagu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Simplehttp</h1>
+      <h2 class="project-tagline">HTTP client for Elixir without dependencies</h2>
+      <a href="https://github.com/alexandrubagu/simplehttp" class="btn">View on GitHub</a>
+      <a href="https://github.com/alexandrubagu/simplehttp/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/alexandrubagu/simplehttp/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="simplehttp----" class="anchor" href="#simplehttp----" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>SimpleHttp <a href="https://travis-ci.org/alexandrubagu/simplehttp"><img src="https://travis-ci.org/alexandrubagu/simplehttp.svg" alt="Travis"></a> <a href="https://hex.pm/packages/simplehttp"><img src="https://img.shields.io/hexpm/v/simplehttp.svg?maxAge=2592000" alt="Hex.pm"></a> <a href="https://hex.pm/packages/simplehttp"><img src="https://img.shields.io/hexpm/dt/simplehttp.svg?maxAge=2592000" alt="Hex.pm"></a> <a href="https://hex.pm/packages/simplehttp"><img src="https://img.shields.io/hexpm/l/simplehttp.svg?maxAge=2592000" alt="Hex.pm"></a>
+</h1>
+
+<h2>
+<a id="description" class="anchor" href="#description" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Description</h2>
+
+<h3>
+<a id="unlike-other-projects--libraries-simplehttp-doesnt-have-other-dependencies" class="anchor" href="#unlike-other-projects--libraries-simplehttp-doesnt-have-other-dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>Unlike other projects / libraries, SimpleHttp doesn't have other dependencies</strong>
+</h3>
+
+<pre><code>$ mix app.tree
+
+simplehttp
+├── elixir
+└── logger
+    └── elixir
+</code></pre>
+
+<h3>
+<a id="other-libraries" class="anchor" href="#other-libraries" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Other libraries:</h3>
+
+<p>Dependencies tree for <a href="https://github.com/myfreeweb/httpotion">myfreeweb/httpotion</a> </p>
+
+<pre><code>$ mix app.tree                          
+
+httpotion
+├── elixir
+├── ssl
+│   ├── crypto
+│   └── public_key
+│       ├── asn1
+│       └── crypto
+└── ibrowse
+</code></pre>
+
+<p>Dependencies tree for <a href="https://github.com/edgurgel/httpoison">edgurgel/httpoison</a></p>
+
+<pre><code>$ mix app.tree                          
+
+httpoison
+├── elixir
+└── hackney
+    ├── crypto
+    ├── asn1
+    ├── public_key
+    │   ├── asn1
+    │   └── crypto
+    ├── ssl
+    │   ├── crypto
+    │   └── public_key
+    ├── idna
+    ├── mimerl
+    ├── certifi
+    ├── ssl_verify_fun
+    │   └── ssl
+    └── metrics
+</code></pre>
+
+<h2>
+<a id="hex-installation" class="anchor" href="#hex-installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hex Installation</h2>
+
+<ol>
+<li>
+<p>Add <code>simplehttp</code> to your list of dependencies in <code>mix.exs</code>:</p>
+
+<div class="highlight highlight-source-elixir"><pre><span class="pl-k">def</span> <span class="pl-en">deps</span> <span class="pl-k">do</span>
+  [{<span class="pl-c1">:simplehttp</span>, <span class="pl-s"><span class="pl-pds">"</span>~&gt; 0.1.0<span class="pl-pds">"</span></span>}]
+<span class="pl-k">end</span></pre></div>
+</li>
+<li>
+<p>Ensure <code>simplehttp</code> is started before your application:</p>
+
+<div class="highlight highlight-source-elixir"><pre><span class="pl-k">def</span> <span class="pl-en">application</span> <span class="pl-k">do</span>
+  [<span class="pl-c1">applications:</span> [<span class="pl-c1">:simplehttp</span>]]
+<span class="pl-k">end</span></pre></div>
+</li>
+</ol>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<p><em>Note</em>:You can load HTTPotion into the Elixir REPL by executing this command from the root of your project:</p>
+
+<div class="highlight highlight-source-elixir"><pre>$ iex <span class="pl-k">-</span><span class="pl-en">S</span> mix</pre></div>
+
+<p><em>Note</em> <strong>Before you start to make a request you need to start inet, this can be do calling this function:</strong></p>
+
+<div class="highlight highlight-source-elixir"><pre><span class="pl-en">SimpleHttp</span>.start</pre></div>
+
+<p>Simple GET Request</p>
+
+<div class="highlight highlight-source-elixir"><pre>    {<span class="pl-c1">:ok</span>, response} <span class="pl-k">=</span> <span class="pl-en">SimpleHttp</span>.get <span class="pl-s"><span class="pl-pds">"</span>http://jsonplaceholder.typicode.com/posts/1<span class="pl-pds">"</span></span>
+
+    <span class="pl-en">IO</span>.inspect response.status 
+    <span class="pl-s"><span class="pl-pds">~s"""</span></span>
+<span class="pl-s">        {'HTTP/1.1', 200, 'OK'}</span>
+<span class="pl-s"><span class="pl-pds">    """</span></span>
+
+    <span class="pl-en">IO</span>.inspect response.headers
+    <span class="pl-s"><span class="pl-pds">~s"""</span></span>
+<span class="pl-s">        [{'cache-control', 'public, max-age=14400'}, {'connection', 'keep-alive'},</span>
+<span class="pl-s">         {'content-length', '292'}, {'content-type', 'application/json; charset=utf-8'},</span>
+<span class="pl-s">         {'expires', 'Wed, 31 Aug 2016 22:15:00 GMT'},</span>
+<span class="pl-s">         {'set-cookie',</span>
+<span class="pl-s">          '__cfduid=d42; expires=Thu, 31-Aug-17 18:15:00 GMT; path=/; domain=.typicode.com; HttpOnly'},</span>
+<span class="pl-s">         {'cf-ray', '2db27722e62f0479-FRA'}] </span>
+<span class="pl-s"><span class="pl-pds">    """</span></span>   
+
+    <span class="pl-en">IO</span>.puts response.body
+    <span class="pl-s"><span class="pl-pds">~s"""</span></span>
+<span class="pl-s">        {</span>
+<span class="pl-s">          "userId": 1,</span>
+<span class="pl-s">          "id": 1,</span>
+<span class="pl-s">          "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",</span>
+<span class="pl-s">          "body": "bla bla"</span>
+<span class="pl-s">        }</span>
+<span class="pl-s"><span class="pl-pds">    """</span></span>
+</pre></div>
+
+<p>GET Request with query params</p>
+
+<div class="highlight highlight-source-elixir"><pre>    {<span class="pl-c1">:ok</span>, response} <span class="pl-k">=</span> <span class="pl-en">SimpleHttp</span>.get <span class="pl-s"><span class="pl-pds">"</span>http://jsonplaceholder.typicode.com/posts/1<span class="pl-pds">"</span></span>, [
+      <span class="pl-c1">query_params:</span> [
+        <span class="pl-c1">postId:</span> <span class="pl-c1">1</span>
+      ]
+    ]
+
+    <span class="pl-en">IO</span>.inspect response.status 
+    <span class="pl-en">IO</span>.inspect response.headers
+    <span class="pl-en">IO</span>.puts response.body</pre></div>
+
+<p>POST with JSON</p>
+
+<div class="highlight highlight-source-elixir"><pre>    {<span class="pl-c1">:ok</span>, response} <span class="pl-k">=</span> <span class="pl-en">SimpleHttp</span>.post <span class="pl-s"><span class="pl-pds">"</span>http://jsonplaceholder.typicode.com/posts<span class="pl-pds">"</span></span>, [
+      <span class="pl-c1">body:</span> <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-cce">\"</span>name<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>foo.example.com<span class="pl-cce">\"</span>}<span class="pl-pds">"</span></span>,
+      <span class="pl-c1">content_type:</span> <span class="pl-s"><span class="pl-pds">"</span>application/json<span class="pl-pds">"</span></span>,
+      <span class="pl-c1">timeout:</span> <span class="pl-c1">1000</span>,
+      <span class="pl-c1">connect_timeout:</span> <span class="pl-c1">1000</span>
+    ]
+
+    <span class="pl-en">IO</span>.inspect response.status 
+    <span class="pl-en">IO</span>.inspect response.headers
+    <span class="pl-en">IO</span>.puts response.body</pre></div>
+
+<p>POST with params</p>
+
+<div class="highlight highlight-source-elixir"><pre>    {<span class="pl-c1">:ok</span>, response} <span class="pl-k">=</span> <span class="pl-en">SimpleHttp</span>.post <span class="pl-s"><span class="pl-pds">"</span>http://jsonplaceholder.typicode.com/posts<span class="pl-pds">"</span></span>, [
+      <span class="pl-c1">params:</span> [
+        <span class="pl-c1">title:</span> <span class="pl-s"><span class="pl-pds">"</span>title is present here<span class="pl-pds">"</span></span>,
+        <span class="pl-c1">message:</span> <span class="pl-s"><span class="pl-pds">"</span>hello world!<span class="pl-pds">"</span></span>
+      ],
+      <span class="pl-c1">content_type:</span> <span class="pl-s"><span class="pl-pds">"</span>application/x-www-form-urlencoded<span class="pl-pds">"</span></span>,
+      <span class="pl-c1">timeout:</span> <span class="pl-c1">1000</span>,
+      <span class="pl-c1">connect_timeout:</span> <span class="pl-c1">1000</span>
+    ]
+
+    <span class="pl-en">IO</span>.inspect response.status 
+    <span class="pl-en">IO</span>.inspect response.headers
+    <span class="pl-en">IO</span>.puts response.body</pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/alexandrubagu/simplehttp">Simplehttp</a> is maintained by <a href="https://github.com/alexandrubagu">alexandrubagu</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
