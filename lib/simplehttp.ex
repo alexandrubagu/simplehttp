@@ -1,9 +1,18 @@
 defmodule SimpleHttp do
   @docmodule """
-     #Author: Alexandru Bagu 
+     #Author: Alexandru Bagu
      #Email: contact@alexandrubagu.info
   """
- 
+  alias SimpleHttp.Request
+  alias SimpleHttp.Response
+  alias SimpleHttp.Exception.BadArgument
+
+  defmacro __using__(_opts) do
+    quote do
+      import SimpleHttp
+    end
+  end
+
   @doc """
     Create virtual methods:
     SimpleHttp.get(...)
@@ -12,13 +21,9 @@ defmodule SimpleHttp do
     SimpleHttp.put(...)
     SimpleHttp.put(...)
   """
-  alias SimpleHttp.Request
-  alias SimpleHttp.Response
-  alias SimpleHttp.Exception.BadArgument
-
   methods = ["get", "post", "delete", "put", "patch"]
   Enum.each methods, fn method ->
-    def unquote(:"#{method}")(url, args \\ []) do 
+    def unquote(:"#{method}")(url, args \\ []) do
       create_request(unquote(String.to_atom(method)), url, args)
       |> execute
     end
@@ -39,12 +44,12 @@ defmodule SimpleHttp do
     response = struct(Response)
     httpc_response = if request.body do
       :httpc.request(request.method, { request.url, request.headers, request.content_type, request.body }, request.http_options, request.options)
-    else 
+    else
       :httpc.request(request.method, { request.url, request.headers }, request.http_options, request.options)
     end
-    
+
     case httpc_response do
-      {:ok, {status, headers, body} } -> 
+      {:ok, {status, headers, body} } ->
         {:ok, %{ response | status: status, headers: headers, body: body } }
       {:error, error } -> IO.inspect error
     end
@@ -63,16 +68,15 @@ defmodule SimpleHttp do
       else
         url |> to_charlist
       end
-    else 
+    else
       raise BadArgument
     end
     request = %{ request | url: url }
 
-
     request = with body <- args[:body], params <- args[:params] do
       if body do
         %{ request | body: body }
-      else 
+      else
         query = if params do
           URI.encode_query(params) |> to_charlist
         else
@@ -81,8 +85,6 @@ defmodule SimpleHttp do
         %{ request | body: query }
       end
     end
-  
-    #update content type
 
     request = if String.valid?(args[:content_type]) do
       %{ request | content_type: to_charlist(args[:content_type]) }
@@ -91,12 +93,12 @@ defmodule SimpleHttp do
     end
 
     keys = [:timeout, :connect_timeout, :autoredirect]
-	http_options = Enum.filter_map keys, fn key ->
-      args[key]
-	end, fn key ->
+    http_options = Enum.filter_map keys, fn key ->
+      args[key]    #update content type
+    end, fn key ->
       Tuple.append(Tuple.append({}, key), args[key])
-	end
-    %{ request | http_options: http_options }
+    end
+    request = %{ request | http_options: http_options }
 
     if args[:debug] do
       IO.puts "------------ DEBUG --------------"
