@@ -15,7 +15,7 @@
       <td valign="top">
 	<pre class="vicinity rich-diff-level-zero">
 	   <code class="rich-diff-level-one">
-$ mix app.tree
+$ mix app.tree      
 
 simplehttp
 ├── elixir
@@ -27,7 +27,7 @@ simplehttp
       <td valign="top">
 	<pre class="vicinity rich-diff-level-zero">
 	   <code class="rich-diff-level-one">
-$ mix app.tree                          
+$ mix app.tree      
 
 httpotion
 ├── elixir
@@ -43,7 +43,7 @@ httpotion
       <td valign="top">
 	<pre class="vicinity rich-diff-level-zero">
 	   <code class="rich-diff-level-one">
-$ mix app.tree                          
+$ mix app.tree      
 
 httpoison
 ├── elixir
