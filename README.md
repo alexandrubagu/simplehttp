@@ -1,8 +1,6 @@
 # SimpleHttp [![Travis](https://travis-ci.org/alexandrubagu/simplehttp.svg)](https://travis-ci.org/alexandrubagu/simplehttp) [![Hex.pm](https://img.shields.io/hexpm/v/simplehttp.svg?maxAge=2592000)](https://hex.pm/packages/simplehttp) [![Hex.pm](https://img.shields.io/hexpm/dt/simplehttp.svg?maxAge=2592000)](https://hex.pm/packages/simplehttp) [![Hex.pm](https://img.shields.io/hexpm/l/simplehttp.svg?maxAge=2592000)](https://hex.pm/packages/simplehttp)
 
-## Description
-
-## **Unlike other projects / libraries, SimpleHttp doesn't have other dependencies**
+## Unlike other projects / libraries, SimpleHttp doesn't have other dependencies
 
 <table>
   <tbody>
