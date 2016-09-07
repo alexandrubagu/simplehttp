@@ -2,20 +2,31 @@
 
 ## Description
 
-###**Unlike other projects / libraries, SimpleHttp doesn't have other dependencies**
+## **Unlike other projects / libraries, SimpleHttp doesn't have other dependencies**
 
-```
+<table>
+  <tbody>
+    <tr>
+      <th>SimpleHttp</th>
+      <th> <a href="https://github.com/myfreeweb/httpotion">myfreeweb/httpotion</a> </th>
+      <th> <a href="https://github.com/edgurgel/httpoison">edgurgel/httpoison</a> </th>
+    </tr>
+    <tr>
+      <td valign="top">
+	<pre class="vicinity rich-diff-level-zero">
+	   <code class="rich-diff-level-one">
 $ mix app.tree
 
 simplehttp
 ├── elixir
 └── logger
     └── elixir
-```
-
-###Other libraries:
-Dependencies tree for [myfreeweb/httpotion](https://github.com/myfreeweb/httpotion) 
-```
+	   </code>
+        </pre> 
+      </td>
+      <td valign="top">
+	<pre class="vicinity rich-diff-level-zero">
+	   <code class="rich-diff-level-one">
 $ mix app.tree                          
 
 httpotion
@@ -26,10 +37,12 @@ httpotion
 │       ├── asn1
 │       └── crypto
 └── ibrowse
-```
-
-Dependencies tree for [edgurgel/httpoison](https://github.com/edgurgel/httpoison)
-```
+	   </code>
+        </pre> 
+      </td>
+      <td valign="top">
+	<pre class="vicinity rich-diff-level-zero">
+	   <code class="rich-diff-level-one">
 $ mix app.tree                          
 
 httpoison
@@ -49,8 +62,12 @@ httpoison
     ├── ssl_verify_fun
     │   └── ssl
     └── metrics
-```
-
+	   </code>
+        </pre> 
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Hex Installation 
 
