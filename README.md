@@ -173,3 +173,4 @@ POST with params
     IO.inspect response.headers
     IO.puts response.body
 ```
+
