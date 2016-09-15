@@ -42,14 +42,39 @@ defmodule SimpleHttp do
   defp execute(request) do
     response = struct(Response)
     httpc_response = if request.body do
-      :httpc.request(request.method, { request.url, request.headers, request.content_type, request.body }, request.http_options, request.options)
+      :httpc.request(
+        request.method, 
+        { 
+          request.url, 
+          request.headers, 
+          request.content_type, 
+          request.body 
+        }, 
+        request.http_options, 
+        request.options)
     else
-      :httpc.request(request.method, { request.url, request.headers }, request.http_options, request.options)
+      :httpc.request(
+        request.method, 
+        { 
+          request.url, 
+          request.headers 
+        }, 
+        request.http_options, 
+        request.options)
     end
 
     case httpc_response do
       {:ok, {status, headers, body} } ->
-        {:ok, %{ response | status: status, headers: headers, body: body } }
+        {:ok, %{ response | 
+            status: status,
+            headers: headers, 
+            body: cond do
+              String.valid?(body) -> body
+              is_list(body) -> to_string(body)
+              true -> raise BadArgument
+            end
+          } 
+        }
       {:error, error } -> IO.inspect error
     end
   end
@@ -93,7 +118,7 @@ defmodule SimpleHttp do
 
     keys = [:timeout, :connect_timeout, :autoredirect]
     http_options = Enum.filter_map keys, fn key ->
-      args[key]    #update content type
+      args[key]
     end, fn key ->
       Tuple.append(Tuple.append({}, key), args[key])
     end
