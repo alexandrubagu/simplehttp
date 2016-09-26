@@ -20,7 +20,11 @@ defmodule SimpleHttp.Mixfile do
   end
 
   defp deps do
-    [{:ex_doc, ">= 0.0.0", only: :dev}]
+    [
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:cowboy, ">= 1.0.4", only: :test},
+      {:plug, ">= 1.2.0", only: :test}
+    ]
   end
 
   defp description do

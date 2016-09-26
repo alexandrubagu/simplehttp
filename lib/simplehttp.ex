@@ -20,7 +20,8 @@ defmodule SimpleHttp do
     end
   end
 
-  methods = ["get", "post", "delete", "put", "patch"]
+  #http://erlang.org/doc/man/httpc.html
+  methods = ["get", "post", "delete", "put", "options"]
   Enum.each methods, fn method ->
     def unquote(:"#{method}")(url, args \\ []) do
       create_request(unquote(String.to_atom(method)), url, args)
