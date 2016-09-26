@@ -3,7 +3,7 @@ defmodule SimpleHttp.Mixfile do
 
   def project do
     [app: :simplehttp,
-     version: "0.2.0",
+     version: "0.4.0",
      elixir: "~> 1.3",
      description: description(),
      package: package(),
