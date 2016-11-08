@@ -2,14 +2,17 @@ defmodule SimpleHttp.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :simplehttp,
-     version: "0.4.0",
-     elixir: "~> 1.3",
-     description: description(),
-     package: package(),
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :simplehttp,
+      version: "0.4.0",
+      elixir: "~> 1.3",
+      description: description(),
+      package: package(),
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls]
+    ]
   end
 
   # Configuration for the OTP application
@@ -23,7 +26,8 @@ defmodule SimpleHttp.Mixfile do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:cowboy, ">= 1.0.4", only: :test},
-      {:plug, ">= 1.2.0", only: :test}
+      {:plug, ">= 1.2.0", only: :test},
+      {:excoveralls, github: "parroty/excoveralls", only: :test}
     ]
   end
 
