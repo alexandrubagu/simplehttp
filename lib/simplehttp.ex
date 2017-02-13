@@ -34,9 +34,9 @@ defmodule SimpleHttp do
   """
   def start do
     case :inets.start do
-      {:ok} -> :ok
+      :ok -> :ok
       {:error, {:already_started, _}} -> :ok
-      {:error, _} -> :error
+      _ -> :error
     end
   end
 
