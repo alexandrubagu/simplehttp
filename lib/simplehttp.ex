@@ -70,18 +70,22 @@ defmodule SimpleHttp do
       end
 
     case httpc_response do
-      {:ok, {status, headers, body} } ->
-        {:ok, %{ response | 
-            status: status,
-            headers: headers, 
-            body: cond do
-              String.valid?(body) -> body
-              is_list(body) -> to_string(body)
-              true -> raise BadArgument
-            end
-          } 
-        }
-      {:error, error } -> IO.inspect error
+      {:ok, {status, headers, body}} ->
+        {:ok,
+         %{
+           response
+           | status: status,
+             headers: headers,
+             body:
+               cond do
+                 String.valid?(body) -> body
+                 is_list(body) -> to_string(body)
+                 true -> raise BadArgument
+               end
+         }}
+
+      {:error, error} ->
+        {:error, error}
     end
   end
 
