@@ -72,8 +72,28 @@ defmodule SimpleHttpTest do
     assert response.body == "ok"
   end
 
+  test "get via request method" do
+    assert {:ok, response } = SimpleHttp.request :get, "http://localhost:4000"
+    assert response.__struct__ == SimpleHttp.Response
+    assert response.body == "ok"
+  end
+
   test "simple post request" do
     assert {:ok, response } = SimpleHttp.post "http://localhost:4000", [
+      params: [
+        title: "title is present here",
+        message: "hello world!"
+      ],
+      content_type: "application/x-www-form-urlencoded",
+      timeout: 1000,
+      connect_timeout: 1000
+    ]
+    assert response.__struct__ == SimpleHttp.Response
+    assert response.body == "ok"
+  end
+
+  test "post via request method" do
+    assert {:ok, response } = SimpleHttp.request :post, "http://localhost:4000", [
       params: [
         title: "title is present here",
         message: "hello world!"
@@ -100,8 +120,28 @@ defmodule SimpleHttpTest do
     assert response.body == "ok"
   end
 
+  test "put via request method" do
+    assert {:ok, response } = SimpleHttp.request :put, "http://localhost:4000/users/1", [
+      params: [
+        title: "title is present here",
+        message: "hello world!"
+      ],
+      content_type: "application/x-www-form-urlencoded",
+      timeout: 1000,
+      connect_timeout: 1000
+    ]
+    assert response.__struct__ == SimpleHttp.Response
+    assert response.body == "ok"
+  end
+
   test "simple delete request" do
     assert {:ok, response } = SimpleHttp.delete "http://localhost:4000"
+    assert response.__struct__ == SimpleHttp.Response
+    assert response.body == "ok"
+  end
+
+  test "delete via request method" do
+    assert {:ok, response } = SimpleHttp.request :delete, "http://localhost:4000"
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
   end
