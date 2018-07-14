@@ -25,10 +25,14 @@ defmodule SimpleHttp do
 
   Enum.each(methods, fn method ->
     def unquote(:"#{method}")(url, args \\ []) do
-      create_request(unquote(String.to_atom(method)), url, args)
-      |> execute
+      request(String.to_atom(unquote(method)), url, args)
     end
   end)
+
+  def request(method, url, args \\ []) do
+    create_request(method, url, args)
+    |> execute
+  end
 
   @doc """
     Before you use this module you SHOULD call SimpleHttp.start
