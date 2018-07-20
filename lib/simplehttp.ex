@@ -1,16 +1,5 @@
 
 defmodule SimpleHttp do
-  @docmodule """
-     #Author: Alexandru Bagu
-     #Email: contact@alexandrubagu.info
-
-     Create virtual methods:
-      SimpleHttp.get(...)
-      SimpleHttp.post(...)
-      SimpleHttp.delete(...)
-      SimpleHttp.put(...)
-      SimpleHttp.put(...)
-  """
   alias SimpleHttp.Request
   alias SimpleHttp.Response
   alias SimpleHttp.Exception.BadArgument
@@ -21,8 +10,15 @@ defmodule SimpleHttp do
     end
   end
 
+  @doc """
+    Create virtual methods such as:
+      SimpleHttp.get(...)
+      SimpleHttp.post(...)
+      SimpleHttp.delete(...)
+      SimpleHttp.put(...)
+      SimpleHttp.put(...)
+  """
   @methods ["get", "post", "delete", "put", "options"]
-
   Enum.each(@methods, fn method ->
     def unquote(:"#{method}")(url, args \\ []) do
       request(String.to_atom(unquote(method)), url, args)
