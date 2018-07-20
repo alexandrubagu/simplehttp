@@ -73,7 +73,7 @@ httpoison
 
     ```elixir
     def deps do
-      [{:simplehttp, "~> 0.4.1"}]
+      [{:simplehttp, "~> 0.4.2"}]
     end
     ```
 
