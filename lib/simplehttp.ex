@@ -1,3 +1,4 @@
+
 defmodule SimpleHttp do
   @docmodule """
      #Author: Alexandru Bagu
@@ -20,10 +21,9 @@ defmodule SimpleHttp do
     end
   end
 
-  # http://erlang.org/doc/man/httpc.html
-  methods = ["get", "post", "delete", "put", "options"]
+  @methods ["get", "post", "delete", "put", "options"]
 
-  Enum.each(methods, fn method ->
+  Enum.each(@methods, fn method ->
     def unquote(:"#{method}")(url, args \\ []) do
       request(String.to_atom(unquote(method)), url, args)
     end
@@ -39,79 +39,56 @@ defmodule SimpleHttp do
   """
   def start do
     case :inets.start() do
-      :ok -> :ok
+      :ok                             -> :ok
       {:error, {:already_started, _}} -> :ok
-      _ -> :error
+      _                               -> :error
     end
   end
 
-  defp execute(request) do
-    response = struct(Response)
-
-    httpc_response =
-      if request.body do
-        :httpc.request(
-          request.method,
-          {
-            request.url,
-            request.headers,
-            request.content_type,
-            request.body
-          },
-          request.http_options,
-          request.options
-        )
-      else
-        :httpc.request(
-          request.method,
-          {
-            request.url,
-            request.headers
-          },
-          request.http_options,
-          request.options
-        )
-      end
+  defp execute(%Request{} = request) do
+    httpc_response = apply(:httpc, :request, params_for_httpc(request))
 
     case httpc_response do
       {:ok, {status, headers, body}} ->
-        {:ok,
-         %{
-           response
-           | status: status,
-             headers: headers,
-             body:
-               cond do
-                 String.valid?(body) -> body
-                 is_list(body) -> to_string(body)
-                 true -> raise BadArgument
-               end
-         }}
-
+        response = struct(Response, %{
+          status: status,
+          headers: headers,
+          body: cast_body(body)
+        })
+        {:ok, response}
       {:error, error} ->
         {:error, error}
     end
   end
 
+  defp cast_body(body) when is_binary(body), do: body
+  defp cast_body(body) when is_list(body), do: to_string(body)
+  defp cast_body(_body), do: raise BadArgument
+
+  defp params_for_httpc(%Request{} = request) do
+    base_params = {request.url, request.headers}
+    params = case request.body do
+      nil -> base_params
+      _   -> base_params
+             |> Tuple.append(request.content_type)
+             |> Tuple.append(request.body)
+    end
+
+    [
+      request.method, params,
+      request.http_options,
+      request.options
+    ]
+  end
+
   defp create_request(method, url, args) do
-    # create struct
     request = struct(Request)
-
-    # update method (post/get/put/patch/detele)
-    request = %{request | method: method}
-
-    url =
-      if String.valid?(url) do
-        if is_map(args[:query_params]) || Keyword.keyword?(args[:query_params]) do
-          (url <> "?" <> URI.encode_query(args[:query_params])) |> to_charlist
-        else
-          url |> to_charlist
-        end
-      else
-        raise BadArgument
-      end
-
-    request = %{request | url: url}
+    |> add_method_to_request(method)
+    |> add_url_to_request(url, args)
+    |> add_content_type_to_request(args)
+    |> add_http_options_to_request(args)
+    |> add_body_or_params_to_request(args)
+    |> debug?(args)
 
     request =
       with body <- args[:body],
@@ -130,15 +107,36 @@ defmodule SimpleHttp do
         end
       end
 
-    request =
-      if String.valid?(args[:content_type]) do
-        %{request | content_type: to_charlist(args[:content_type])}
+    request
+  end
+
+  defp add_method_to_request(%Request{} = request, method), do: %{request | method: method}
+  defp add_url_to_request(%Request{} = request, url, args) do
+    url =
+      if String.valid?(url) do
+        query_params = Keyword.get(args, :query_params)
+        if is_map(query_params) || Keyword.keyword?(query_params) do
+          (url <> "?" <> URI.encode_query(query_params)) |> to_charlist
+        else
+          url |> to_charlist
+        end
       else
-        %{request | content_type: args[:content_type]}
+        raise BadArgument
       end
 
-    keys = [:timeout, :connect_timeout, :autoredirect]
+    %{request | url: url}
+  end
 
+  defp add_content_type_to_request(%Request{} = request, args) do
+    if String.valid?(args[:content_type]) do
+      %{request | content_type: to_charlist(args[:content_type])}
+    else
+      %{request | content_type: args[:content_type]}
+    end
+  end
+
+  defp add_http_options_to_request(%Request{} = request, args) do
+    keys = [:timeout, :connect_timeout, :autoredirect]
     http_options =
       Enum.filter_map(
         keys,
@@ -150,14 +148,32 @@ defmodule SimpleHttp do
         end
       )
 
-    request = %{request | http_options: http_options}
+    %{request | http_options: http_options}
+  end
 
-    if args[:debug] do
-      IO.puts("------------ DEBUG --------------")
-      IO.inspect(request)
-      IO.puts("------------ DEBUG --------------")
+  defp add_body_or_params_to_request(%Request{} = request, args) do
+    with body   <- Keyword.get(args, :body, nil),
+         params <- Keyword.get(args, :params, nil)
+    do
+      if body do
+        %{request | body: body}
+      else
+        query =
+          if params do
+            URI.encode_query(params) |> to_charlist
+          else
+            nil
+          end
+
+        %{request | body: query}
+      end
     end
+  end
 
-    request
+  defp debug?(%Request{} = request, args) do
+    case Keyword.get(args, :debug) do
+      nil  -> request
+      true -> IO.inspect(request)
+    end
   end
 end
