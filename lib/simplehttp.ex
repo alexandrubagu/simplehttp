@@ -82,32 +82,13 @@ defmodule SimpleHttp do
   end
 
   defp create_request(method, url, args) do
-    request = struct(Request)
+    struct(Request)
     |> add_method_to_request(method)
     |> add_url_to_request(url, args)
     |> add_content_type_to_request(args)
     |> add_http_options_to_request(args)
     |> add_body_or_params_to_request(args)
     |> debug?(args)
-
-    request =
-      with body <- args[:body],
-           params <- args[:params] do
-        if body do
-          %{request | body: body}
-        else
-          query =
-            if params do
-              URI.encode_query(params) |> to_charlist
-            else
-              nil
-            end
-
-          %{request | body: query}
-        end
-      end
-
-    request
   end
 
   defp add_method_to_request(%Request{} = request, method), do: %{request | method: method}
