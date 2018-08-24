@@ -81,7 +81,7 @@ defmodule SimpleHttp do
     struct(Request)
     |> add_method_to_request(method)
     |> add_url_to_request(url, args)
-    |> add_content_type_to_request(args)
+    |> add_headers_to_request(args)
     |> add_http_options_to_request(args)
     |> add_body_or_params_to_request(args)
     |> debug?(args)
@@ -104,11 +104,26 @@ defmodule SimpleHttp do
     %{request | url: url}
   end
 
-  defp add_content_type_to_request(%Request{} = request, args) do
-    if String.valid?(args[:content_type]) do
-      %{request | content_type: to_charlist(args[:content_type])}
-    else
-      %{request | content_type: args[:content_type]}
+  defp add_headers_to_request(%Request{} = request, args) do
+    content_type_key = "Content-Type"
+    content_type = args[:headers][content_type_key]
+    headers = pop_in(args[:headers][content_type_key])
+    |> elem(1)
+    |> Keyword.get(:headers, %{})
+    |> Map.to_list
+
+    request = case String.valid?(content_type) do
+      true ->
+        %{request | content_type: to_charlist(content_type)}
+      false ->
+        request
+    end
+
+    case Enum.empty?(headers) do
+      true ->
+        request
+      false ->
+        %{request | headers: headers}
     end
   end
 
@@ -150,7 +165,7 @@ defmodule SimpleHttp do
   defp debug?(%Request{} = request, args) do
     case Keyword.get(args, :debug) do
       nil  -> request
-      true -> IO.inspect(request)
+      _ -> IO.inspect(request)
     end
   end
 end

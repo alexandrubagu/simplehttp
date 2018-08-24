@@ -84,7 +84,10 @@ defmodule SimpleHttpTest do
         title: "title is present here",
         message: "hello world!"
       ],
-      content_type: "application/x-www-form-urlencoded",
+      headers: %{
+        "Content-Type" => "application/x-www-form-urlencoded",
+        "Authorization" => "Bearer hash"
+      },
       timeout: 1000,
       connect_timeout: 1000
     ]
@@ -98,7 +101,10 @@ defmodule SimpleHttpTest do
         title: "title is present here",
         message: "hello world!"
       ],
-      content_type: "application/x-www-form-urlencoded",
+      headers: %{
+        "Content-Type" => "application/x-www-form-urlencoded",
+        "Authorization" => "Bearer hash"
+      },
       timeout: 1000,
       connect_timeout: 1000
     ]
@@ -112,7 +118,10 @@ defmodule SimpleHttpTest do
         title: "title is present here",
         message: "hello world!"
       ],
-      content_type: "application/x-www-form-urlencoded",
+      headers: %{
+        "Content-Type" => "application/x-www-form-urlencoded",
+        "Authorization" => "Bearer hash"
+      },
       timeout: 1000,
       connect_timeout: 1000
     ]
@@ -126,7 +135,10 @@ defmodule SimpleHttpTest do
         title: "title is present here",
         message: "hello world!"
       ],
-      content_type: "application/x-www-form-urlencoded",
+      headers: %{
+        "Content-Type" => "application/x-www-form-urlencoded",
+        "Authorization" => "Bearer hash"
+      },
       timeout: 1000,
       connect_timeout: 1000
     ]
@@ -159,7 +171,10 @@ defmodule SimpleHttpTest do
   test "json post" do
     assert {:ok, response} = SimpleHttp.post "http://localhost:4000/", [
       body: "{\"name\":\"foo.example.com\"}",
-      content_type: "application/json",
+      headers: %{
+        "Content-Type" => "application/x-www-form-urlencoded",
+        "Authorization" => "Bearer hash"
+      },
       timeout: 1000,
       connect_timeout: 1000
     ]

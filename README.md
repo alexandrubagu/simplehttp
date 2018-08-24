@@ -73,7 +73,7 @@ httpoison
 
     ```elixir
     def deps do
-      [{:simplehttp, "~> 0.4.2"}]
+      [{:simplehttp, "~> 0.5.0"}]
     end
     ```
 
@@ -147,7 +147,11 @@ POST with JSON
 ```elixir
     {:ok, response} = SimpleHttp.post "http://jsonplaceholder.typicode.com/posts", [
       body: "{\"name\":\"foo.example.com\"}",
-      content_type: "application/json",
+      headers: %{
+        "Content-Type" => "application/x-www-form-urlencoded",
+        "Authorization" => "Bearer hash",
+        "X-Customer" => "123"
+      }
       timeout: 1000,
       connect_timeout: 1000
     ]
@@ -164,7 +168,11 @@ POST with params
         title: "title is present here",
         message: "hello world!"
       ],
-      content_type: "application/x-www-form-urlencoded",
+      headers: %{
+        "Content-Type" => "application/x-www-form-urlencoded",
+        "Authorization" => "Bearer hash",
+        "X-Customer" => "123"
+      }
       timeout: 1000,
       connect_timeout: 1000
     ]
