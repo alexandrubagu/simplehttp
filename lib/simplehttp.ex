@@ -111,6 +111,9 @@ defmodule SimpleHttp do
     |> elem(1)
     |> Keyword.get(:headers, %{})
     |> Map.to_list
+    |> Enum.map(fn {x, y} ->
+      {to_charlist(x), to_charlist(y)}
+    end)
 
     request = case String.valid?(content_type) do
       true ->
