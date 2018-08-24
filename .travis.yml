@@ -5,9 +5,9 @@ elixir:
   - 1.5
   - 1.4
 otp_release:
-  - 21
-  - 20
-  - 19
+  - 21.0
+  - 20.3
+  - 19.3
 sudo: false
 script:
   - "MIX_ENV=test mix do deps.get, test && mix compile && MIX_ENV=test mix coveralls.travis"
