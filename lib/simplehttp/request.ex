@@ -1,5 +1,9 @@
-
 defmodule SimpleHttp.Request do
+  @moduledoc """
+  Defines a http request
+  """
+  @type t :: %__MODULE__{}
+
   defstruct method: nil,
             url: nil,
             headers: [],

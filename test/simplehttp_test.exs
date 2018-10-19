@@ -6,16 +6,16 @@ defmodule SimpleHttpTest do
     use Plug.Router
     require Logger
 
-    plug Plug.Logger
-    plug :match
-    plug :dispatch
+    plug(Plug.Logger)
+    plug(:match)
+    plug(:dispatch)
 
     def init(options) do
       options
     end
 
     def start_link do
-      {:ok, _} = Plug.Adapters.Cowboy.http Test.Server, []
+      {:ok, _} = Plug.Adapters.Cowboy.http(Test.Server, [])
     end
 
     get "/" do
@@ -41,7 +41,6 @@ defmodule SimpleHttpTest do
       |> send_resp(200, "ok")
       |> halt
     end
-
   end
 
   defmodule Test.Supervisor do
@@ -60,124 +59,136 @@ defmodule SimpleHttpTest do
   end
 
   setup_all do
-    case Test.Supervisor.start([],[]) do
+    case Test.Supervisor.start([], []) do
       {:ok, _} -> :ok
       _ -> raise "Error"
     end
   end
 
   test "simple get request" do
-    assert {:ok, response } = SimpleHttp.get "http://localhost:4000"
+    assert {:ok, response} = SimpleHttp.get("http://localhost:4000")
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
   end
 
   test "get via request method" do
-    assert {:ok, response } = SimpleHttp.request :get, "http://localhost:4000"
+    assert {:ok, response} = SimpleHttp.request(:get, "http://localhost:4000")
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
   end
 
   test "simple post request" do
-    assert {:ok, response } = SimpleHttp.post "http://localhost:4000", [
-      params: [
-        title: "title is present here",
-        message: "hello world!"
-      ],
-      headers: %{
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "Authorization" => "Bearer hash"
-      },
-      timeout: 1000,
-      connect_timeout: 1000
-    ]
+    assert {:ok, response} =
+             SimpleHttp.post("http://localhost:4000",
+               params: [
+                 title: "title is present here",
+                 message: "hello world!"
+               ],
+               headers: %{
+                 "Content-Type" => "application/x-www-form-urlencoded",
+                 "Authorization" => "Bearer hash"
+               },
+               timeout: 1000,
+               connect_timeout: 1000
+             )
+
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
   end
 
   test "post via request method" do
-    assert {:ok, response } = SimpleHttp.request :post, "http://localhost:4000", [
-      params: [
-        title: "title is present here",
-        message: "hello world!"
-      ],
-      headers: %{
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "Authorization" => "Bearer hash"
-      },
-      timeout: 1000,
-      connect_timeout: 1000
-    ]
+    assert {:ok, response} =
+             SimpleHttp.request(:post, "http://localhost:4000",
+               params: [
+                 title: "title is present here",
+                 message: "hello world!"
+               ],
+               headers: %{
+                 "Content-Type" => "application/x-www-form-urlencoded",
+                 "Authorization" => "Bearer hash"
+               },
+               timeout: 1000,
+               connect_timeout: 1000
+             )
+
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
   end
 
   test "simple put request" do
-    assert {:ok, response } = SimpleHttp.put "http://localhost:4000/users/1", [
-      params: [
-        title: "title is present here",
-        message: "hello world!"
-      ],
-      headers: %{
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "Authorization" => "Bearer hash"
-      },
-      timeout: 1000,
-      connect_timeout: 1000
-    ]
+    assert {:ok, response} =
+             SimpleHttp.put("http://localhost:4000/users/1",
+               params: [
+                 title: "title is present here",
+                 message: "hello world!"
+               ],
+               headers: %{
+                 "Content-Type" => "application/x-www-form-urlencoded",
+                 "Authorization" => "Bearer hash"
+               },
+               timeout: 1000,
+               connect_timeout: 1000
+             )
+
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
   end
 
   test "put via request method" do
-    assert {:ok, response } = SimpleHttp.request :put, "http://localhost:4000/users/1", [
-      params: [
-        title: "title is present here",
-        message: "hello world!"
-      ],
-      headers: %{
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "Authorization" => "Bearer hash"
-      },
-      timeout: 1000,
-      connect_timeout: 1000
-    ]
+    assert {:ok, response} =
+             SimpleHttp.request(:put, "http://localhost:4000/users/1",
+               params: [
+                 title: "title is present here",
+                 message: "hello world!"
+               ],
+               headers: %{
+                 "Content-Type" => "application/x-www-form-urlencoded",
+                 "Authorization" => "Bearer hash"
+               },
+               timeout: 1000,
+               connect_timeout: 1000
+             )
+
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
   end
 
   test "simple delete request" do
-    assert {:ok, response } = SimpleHttp.delete "http://localhost:4000"
+    assert {:ok, response} = SimpleHttp.delete("http://localhost:4000")
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
   end
 
   test "delete via request method" do
-    assert {:ok, response } = SimpleHttp.request :delete, "http://localhost:4000"
+    assert {:ok, response} = SimpleHttp.request(:delete, "http://localhost:4000")
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
   end
 
   test "simple get with query params" do
-    assert {:ok, response} = SimpleHttp.get "http://localhost:4000/", [
-      query_params: [
-        postId: 1,
-        title: "Alexandru Bagu"
-      ]
-    ]
+    assert {:ok, response} =
+             SimpleHttp.get("http://localhost:4000/",
+               query_params: [
+                 postId: 1,
+                 title: "Alexandru Bagu"
+               ]
+             )
+
     assert response.__struct__ == SimpleHttp.Response
   end
 
   test "json post" do
-    assert {:ok, response} = SimpleHttp.post "http://localhost:4000/", [
-      body: "{\"name\":\"foo.example.com\"}",
-      headers: %{
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "Authorization" => "Bearer hash"
-      },
-      timeout: 1000,
-      connect_timeout: 1000
-    ]
+    assert {:ok, response} =
+             SimpleHttp.post("http://localhost:4000/",
+               body: "{\"name\":\"foo.example.com\"}",
+               headers: %{
+                 "Content-Type" => "application/x-www-form-urlencoded",
+                 "Authorization" => "Bearer hash"
+               },
+               timeout: 1000,
+               connect_timeout: 1000
+             )
+
     assert response.__struct__ == SimpleHttp.Response
   end
 end

@@ -73,30 +73,17 @@ httpoison
 
     ```elixir
     def deps do
-      [{:simplehttp, "~> 0.5.0"}]
+      [{:simplehttp, "~> 0.5.1"}]
     end
     ```
 
-  2. Ensure `simplehttp` is started before your application:
-
-    ```elixir
-    def application do
-      [applications: [:simplehttp]]
-    end
-    ```
 
 ## Usage
 
-*Note*:You can load HTTPotion into the Elixir REPL by executing this command from the root of your project:
+*Note*:You can load SimpleHttp into the Elixir REPL by executing this command from the root of your project:
 
 ```elixir
 $ iex -S mix
-```
-
-*Note* **Before you start to make a request you need to start inet, this can be do calling this function:**
-
-```elixir
-SimpleHttp.start
 ```
 
 Simple GET Request

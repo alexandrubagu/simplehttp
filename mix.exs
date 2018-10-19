@@ -4,14 +4,19 @@ defmodule SimpleHttp.Mixfile do
   def project do
     [
       app: :simplehttp,
-      version: "0.5.0",
-      elixir: "~> 1.4",
+      version: "0.5.1",
+      elixir: "~> 1.6",
       description: description(),
       package: package(),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
-      test_coverage: [tool: ExCoveralls]
+      test_coverage: [tool: ExCoveralls],
+      dialyzer: [
+        plt_add_deps: :transitive,
+        plt_add_apps: [:mix],
+        flags: [:race_conditions, :no_opaque]
+      ]
     ]
   end
 
@@ -19,7 +24,7 @@ defmodule SimpleHttp.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :inets]]
   end
 
   defp deps do
@@ -27,7 +32,9 @@ defmodule SimpleHttp.Mixfile do
       {:ex_doc, "~> 0.18.0", only: :dev},
       {:cowboy, "~> 1.0.4", only: :test},
       {:plug, ">= 1.2.0", only: :test},
-      {:excoveralls, github: "parroty/excoveralls", only: :test}
+      {:excoveralls, "~> 0.10", only: :test},
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
+      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -38,13 +45,18 @@ defmodule SimpleHttp.Mixfile do
   end
 
   defp package do
-    [# These are the default files included in the package
+    # These are the default files included in the package
+    [
       name: :simplehttp,
       description: "HTTP client for Elixir without dependencies",
       files: ["lib", "config", "mix.exs", "README*"],
       maintainers: ["Bagu Alexandru Bogdan"],
       licenses: ["Apache 2.0"],
-      links: %{"GitHub" => "https://github.com/alexandrubagu/simplehttp", "Docs" => "https://github.com/alexandrubagu/simplehttp", "Website" => "http://www.alexandrubagu.info" }]
+      links: %{
+        "GitHub" => "https://github.com/alexandrubagu/simplehttp",
+        "Docs" => "https://github.com/alexandrubagu/simplehttp",
+        "Website" => "http://www.alexandrubagu.info"
+      }
+    ]
   end
-
 end
