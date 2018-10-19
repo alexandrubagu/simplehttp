@@ -5,7 +5,7 @@ defmodule SimpleHttp.Mixfile do
     [
       app: :simplehttp,
       version: "0.5.1",
-      elixir: "~> 1.6",
+      elixir: "~> 1.4",
       description: description(),
       package: package(),
       build_embedded: Mix.env() == :prod,
