@@ -71,11 +71,11 @@ httpoison
 
   1. Add `simplehttp` to your list of dependencies in `mix.exs`:
 
-    ```elixir
-    def deps do
-      [{:simplehttp, "~> 0.5.1"}]
-    end
-    ```
+  ```elixir
+  def deps do
+    [{:simplehttp, "~> 0.5.1"}]
+  end
+  ```
 
 
 ## Usage
@@ -88,72 +88,73 @@ $ iex -S mix
 
 Simple GET Request
 ```elixir
-    {:ok, response} = SimpleHttp.get "http://jsonplaceholder.typicode.com/posts/1"
+{:ok, response} = SimpleHttp.get "http://jsonplaceholder.typicode.com/posts/1"
 
-    IO.inspect response.status 
-    ~s"""
-         200
-    """
-
-    IO.inspect response.headers
-    ~s"""
-   		[{'cache-control', 'public, max-age=14400'}, {'connection', 'keep-alive'},
-		 {'content-length', '292'}, {'content-type', 'application/json; charset=utf-8'},
-		 {'expires', 'Wed, 31 Aug 2016 22:15:00 GMT'},
-		 {'set-cookie',
-		  '__cfduid=d42; expires=Thu, 31-Aug-17 18:15:00 GMT; path=/; domain=.typicode.com; HttpOnly'},
-		 {'cf-ray', '2db27722e62f0479-FRA'}] 
-    """   
-
-    IO.puts response.body
-	~s"""
-		{
-		  "userId": 1,
-		  "id": 1,
-		  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-		  "body": "bla bla"
-		}
-	"""
-
+IO.inspect response 
+{:ok,
+%SimpleHttp.Response{
+  body: "{\n  \"userId\": 1,\n  \"id\": 1,\n  \"title\": \"sunt aut facere repellat provident occaecati excepturi optio reprehenderit\",\n  \"body\": \"quia et suscipit\\nsuscipit recusandae consequuntur expedita et cum\\nreprehenderit molestiae ut ut quas totam\\nnostrum rerum est autem sunt rem eveniet architecto\"\n}",
+  headers: [
+    {'cache-control', 'public, max-age=14400'},
+    {'connection', 'keep-alive'},
+    {'date', 'Mon, 22 Oct 2018 07:02:48 GMT'},
+    {'pragma', 'no-cache'},
+    {'via', '1.1 vegur'},
+    {'etag', 'W/"124-yiKdLzqO5gfBrJFrcdJ8Yq0LGnU"'},
+    {'server', 'cloudflare'},
+    {'vary', 'Origin, Accept-Encoding'},
+    {'content-length', '292'},
+    {'content-type', 'application/json; charset=utf-8'},
+    {'expires', 'Mon, 22 Oct 2018 11:02:48 GMT'},
+    {'set-cookie',
+      '__cfduid=de34235eb1c3436a238889924c15be9671540191768; expires=Tue, 22-Oct-19 07:02:48 GMT; path=/; domain=.typicode.com; HttpOnly'},
+    {'x-powered-by', 'Express'},
+    {'access-control-allow-credentials', 'true'},
+    {'x-content-type-options', 'nosniff'},
+    {'cf-cache-status', 'HIT'},
+    {'cf-ray', '46da19b6d5f87ea0-BUD'}
+  ],
+  status: 200
+}}
 ```
 
 GET Request with query params
 ```elixir
-    {:ok, response} = SimpleHttp.get "http://jsonplaceholder.typicode.com/posts/1", [
-      query_params: [
-        postId: 1
-      ]
-    ]
+{:ok, response} = SimpleHttp.get "http://jsonplaceholder.typicode.com/posts/1", [
+  query_params: [
+    postId: 1
+  ]
+]
 ```
 
 POST with JSON
 ```elixir
-    {:ok, response} = SimpleHttp.post "http://jsonplaceholder.typicode.com/posts", [
-      body: "{\"name\":\"foo.example.com\"}",
-      headers: %{
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "Authorization" => "Bearer hash",
-        "X-Customer" => "123"
-      }
-      timeout: 1000,
-      connect_timeout: 1000
-    ]
+{:ok, response} = SimpleHttp.post "http://jsonplaceholder.typicode.com/posts", [
+  body: "{\"name\":\"foo.example.com\"}",
+  headers: %{
+    "Content-Type" => "application/x-www-form-urlencoded",
+    "Authorization" => "Bearer hash",
+    "X-Customer" => "123"
+  }
+  timeout: 1000,
+  connect_timeout: 1000
+]
 ```
 
 POST with params
 ```elixir
-    {:ok, response} = SimpleHttp.post "http://jsonplaceholder.typicode.com/posts", [
-      params: [
-        title: "title is present here",
-        message: "hello world!"
-      ],
-      headers: %{
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "Authorization" => "Bearer hash",
-        "X-Customer" => "123"
-      }
-      timeout: 1000,
-      connect_timeout: 1000
-    ]
+{:ok, response} = SimpleHttp.post "http://jsonplaceholder.typicode.com/posts", [
+  params: [
+    title: "title is present here",
+    message: "hello world!"
+  ],
+  headers: %{
+    "Content-Type" => "application/x-www-form-urlencoded",
+    "Authorization" => "Bearer hash",
+    "X-Customer" => "123"
+  }
+  timeout: 1000,
+  connect_timeout: 1000
+]
 ```
 
