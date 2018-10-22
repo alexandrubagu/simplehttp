@@ -92,7 +92,7 @@ Simple GET Request
 
     IO.inspect response.status 
     ~s"""
-        {'HTTP/1.1', 200, 'OK'}
+         200
     """
 
     IO.inspect response.headers
@@ -124,10 +124,6 @@ GET Request with query params
         postId: 1
       ]
     ]
-
-    IO.inspect response.status 
-    IO.inspect response.headers
-    IO.puts response.body
 ```
 
 POST with JSON
@@ -142,10 +138,6 @@ POST with JSON
       timeout: 1000,
       connect_timeout: 1000
     ]
-
-    IO.inspect response.status 
-    IO.inspect response.headers
-    IO.puts response.body
 ```
 
 POST with params
@@ -163,9 +155,5 @@ POST with params
       timeout: 1000,
       connect_timeout: 1000
     ]
-
-    IO.inspect response.status 
-    IO.inspect response.headers
-    IO.puts response.body
 ```
 
