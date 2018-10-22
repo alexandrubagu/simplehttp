@@ -29,9 +29,8 @@ defmodule SimpleHttp.Mixfile do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.18.0", only: :dev},
-      {:cowboy, "~> 1.0.4", only: :test},
-      {:plug, ">= 1.2.0", only: :test},
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:plug_cowboy, "~> 2.0", only: :test},
       {:excoveralls, "~> 0.10", only: :test},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
