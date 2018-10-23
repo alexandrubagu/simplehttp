@@ -135,7 +135,7 @@ POST with JSON
     "Content-Type" => "application/x-www-form-urlencoded",
     "Authorization" => "Bearer hash",
     "X-Customer" => "123"
-  }
+  },
   timeout: 1000,
   connect_timeout: 1000
 ]
@@ -152,7 +152,7 @@ POST with params
     "Content-Type" => "application/x-www-form-urlencoded",
     "Authorization" => "Bearer hash",
     "X-Customer" => "123"
-  }
+  },
   timeout: 1000,
   connect_timeout: 1000
 ]
