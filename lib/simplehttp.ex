@@ -15,9 +15,12 @@ defmodule SimpleHttp do
       SimpleHttp.post(...)
       SimpleHttp.delete(...)
       SimpleHttp.put(...)
-      SimpleHttp.put(...)
+      SimpleHttp.options(...)
+      SimpleHttp.head(...)
+      SimpleHttp.patch(...)
+      SimpleHttp.trace(...)
   """
-  @methods ["get", "post", "delete", "put", "options"]
+  @methods ["get", "post", "delete", "put", "options", "head", "patch", "trace"]
   Enum.each(@methods, fn method ->
     def unquote(:"#{method}")(url, args \\ []) do
       request(String.to_atom(unquote(method)), url, args)
