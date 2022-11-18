@@ -15,7 +15,7 @@ defmodule SimpleHttpTest do
     end
 
     def start_link do
-      {:ok, _} = Plug.Adapters.Cowboy.http(Test.Server, [])
+      {:ok, _} = Plug.Adapters.Cowboy.http(__MODULE__, [])
     end
 
     get "/" do
@@ -49,11 +49,12 @@ defmodule SimpleHttpTest do
     def start(_type, _args) do
       import Supervisor.Spec, warn: false
 
+      Application.ensure_all_started(:cowboy_telemetry)
       children = [
-        worker(Test.Server, [])
+        %{id: __MODULE__, start: {Test.Server, :start_link, []}}
       ]
 
-      opts = [strategy: :one_for_one, name: Test.Supervisor]
+      opts = [strategy: :one_for_one, name: __MODULE__]
       Supervisor.start_link(children, opts)
     end
   end
@@ -108,11 +109,15 @@ defmodule SimpleHttpTest do
                  "Authorization" => "Bearer hash"
                },
                timeout: 1000,
-               connect_timeout: 1000
+               connect_timeout: 1000,
+               max_sessions: 5,
+               verbose: :verbose
              )
 
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
+    assert {:ok, [{:max_sessions, 5}, {:verbose, :verbose}]} ==
+           :httpc.get_options([:max_sessions, :verbose])
   end
 
   test "simple put request" do
@@ -127,11 +132,13 @@ defmodule SimpleHttpTest do
                  "Authorization" => "Bearer hash"
                },
                timeout: 1000,
-               connect_timeout: 1000
+               connect_timeout: 1000,
+               verbose: false
              )
 
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
+    assert {:ok, [{:verbose, false}]} == :httpc.get_options([:verbose])
   end
 
   test "put via request method" do

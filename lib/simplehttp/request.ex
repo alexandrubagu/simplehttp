@@ -10,5 +10,6 @@ defmodule SimpleHttp.Request do
             content_type: nil,
             body: nil,
             http_options: [],
-            options: []
+            options: [],
+            global_options: []
 end

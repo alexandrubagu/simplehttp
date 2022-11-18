@@ -30,12 +30,22 @@ defmodule SimpleHttp do
   @spec request(atom(), String.t(), keyword()) :: {:error, any()} | {:ok, SimpleHttp.Response.t()}
   def request(method, url, args \\ []) do
     request = create_request(method, url, args)
+    if request.global_options != [] do
+      case :httpc.set_options(request.global_options) do
+        :ok ->
+          :ok
+        {:error, err} ->
+          raise BadArgument, message: "Error setting global options: #{err}"
+      end
+    end
     execute(request)
   end
 
   @spec execute(SimpleHttp.Request.t()) :: {:error, any()} | {:ok, SimpleHttp.Response.t()}
-  defp execute(%Request{} = request) do
-    httpc_response = apply(:httpc, :request, params_for_httpc(request))
+  defp execute(%Request{} = req) do
+    params = req.body && {req.url, req.headers, req.content_type, req.body} || {req.url, req.headers}
+
+    httpc_response = :httpc.request(req.method, params, req.http_options, req.options)
 
     case httpc_response do
       {:ok, {{_, status, _}, headers, body}} ->
@@ -47,6 +57,9 @@ defmodule SimpleHttp do
 
         {:ok, response}
 
+      {:ok, :saved_to_file} = response ->
+        response
+
       {:error, error} ->
         {:error, error}
     end
@@ -56,34 +69,14 @@ defmodule SimpleHttp do
   defp cast_body(body) when is_list(body), do: to_string(body)
   defp cast_body(_body), do: raise(BadArgument)
 
-  defp params_for_httpc(%Request{} = request) do
-    base_params = {request.url, request.headers}
-
-    params =
-      case request.body do
-        nil ->
-          base_params
-
-        _ ->
-          base_params
-          |> Tuple.append(request.content_type)
-          |> Tuple.append(request.body)
-      end
-
-    [
-      request.method,
-      params,
-      request.http_options,
-      request.options
-    ]
-  end
-
   defp create_request(method, url, args) do
     %Request{}
     |> add_method_to_request(method)
     |> add_url_to_request(url, args)
     |> add_headers_to_request(args)
+    |> add_global_options(args)
     |> add_http_options_to_request(args)
+    |> add_options_to_request(args)
     |> add_body_or_params_to_request(args)
     |> debug?(args)
   end
@@ -91,35 +84,27 @@ defmodule SimpleHttp do
   defp add_method_to_request(%Request{} = request, method), do: %{request | method: method}
 
   defp add_url_to_request(%Request{} = request, url, args) do
-    url =
-      if String.valid?(url) do
-        query_params = Keyword.get(args, :query_params)
+    String.valid?(url) || raise BadArgument, message: "URL must be a string"
+    query_params = Keyword.get(args, :query_params)
 
-        if is_map(query_params) || Keyword.keyword?(query_params) do
-          (url <> "?" <> URI.encode_query(query_params)) |> to_charlist
-        else
-          url |> to_charlist
-        end
+    url =
+      if is_map(query_params) || Keyword.keyword?(query_params) do
+        (url <> "?" <> URI.encode_query(query_params))
       else
-        raise BadArgument
+        url
       end
 
-    %{request | url: url}
+    %{request | url: cstr(url)}
   end
 
   defp add_headers_to_request(%Request{} = request, args) do
     content_type_key = "Content-Type"
-    content_type = args[:headers][content_type_key]
+    {content_type, headers} = pop_in(args[:headers][content_type_key])
 
     headers =
-      args[:headers][content_type_key]
-      |> pop_in
-      |> elem(1)
+      headers
       |> Keyword.get(:headers, %{})
-      |> Map.to_list()
-      |> Enum.map(fn {x, y} ->
-        {to_charlist(x), to_charlist(y)}
-      end)
+      |> Enum.map(fn {x,y} -> {to_charlist(x), to_charlist(y)} end)
 
     request =
       case String.valid?(content_type) do
@@ -140,17 +125,36 @@ defmodule SimpleHttp do
   end
 
   defp add_http_options_to_request(%Request{} = request, args) do
-    keys = [:timeout, :connect_timeout, :autoredirect]
-
-    http_options =
-      Enum.reduce(keys, [], fn key, acc ->
-        case args[key] do
-          nil -> acc
-          value -> acc ++ [{key, value}]
-        end
-      end)
+    keys = [
+      :timeout, :connect_timeout, :autoredirect,
+      :ssl, :essl, :proxy_auth, :version, :relaxed
+    ]
+    http_options = filter_options(keys, args)
 
     %{request | http_options: http_options}
+  end
+
+  defp add_options_to_request(%Request{} = request, args) do
+    keys = [
+      :sync, :stream, :body_format, :full_result, :headers_as_is,
+      :socket_opts, :receiver, :ipv6_host_with_brackets
+    ]
+    options = filter_options(keys, args)
+
+    %{request | options: options}
+  end
+
+  defp add_global_options(%Request{} = request, args) do
+    keys = [
+      :proxy,                 :https_proxy,           :max_sessions,
+      :max_keep_alive_length, :keep_alive_timeout,    :max_pipeline_length,
+      :pipeline_timeout,      :cookies,               :ipfamily,
+      :ip,                    :port,                  :socket_opts,
+      :verbose,               :unix_socket
+    ]
+    options = filter_options(keys, args)
+
+    %{request | global_options: options}
   end
 
   defp add_body_or_params_to_request(%Request{} = request, args) do
@@ -172,6 +176,26 @@ defmodule SimpleHttp do
       end
     end
   end
+
+  defp filter_options(keys, args) do
+    Enum.map(keys, &{&1, option_value(&1, args[&1])})
+    |> Enum.filter(fn {_,v} -> v != nil end)
+  end
+
+  defp option_value(_, nil),                   do: nil
+  defp option_value(:stream, v),               do: cstr(v)
+  defp option_value(:proxy_auth, {u,p}),       do: {cstr(u), cstr(p)}
+  defp option_value(:body_format, v),          do: cstr(v)
+  defp option_value(:proxy, {{h,p},np}),       do: {{cstr(h),p},list_cstr(np)}
+  defp option_value(:https_proxy, {{h,p},np}), do: {{cstr(h),p},list_cstr(np)}
+  defp option_value(:unix_socket, v),          do: cstr(v)
+  defp option_value(_, v),                     do: v
+
+  defp cstr(v) when is_binary(v),              do: String.to_charlist(v)
+  defp cstr(v),                                do: v
+
+  defp list_cstr(v) when is_list(v),           do: for i <- v, do: cstr(i)
+  defp list_cstr(v),                           do: cstr(v)
 
   defp debug?(%Request{} = request, args) do
     case Keyword.get(args, :debug) do
