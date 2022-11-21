@@ -24,16 +24,16 @@ defmodule SimpleHttp.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [extra_applications: [:inets, {:ssl, :optional}, :logger]]
+    [extra_applications: [ssl: :optional, inets: :optional]]
   end
 
   defp deps do
     [
-      {:ex_doc, ">= 0.0.0", only: :dev},
-      {:plug_cowboy, "~> 2.0", only: :test},
-      {:excoveralls, "~> 0.10", only: :test},
-      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:plug_cowboy, "~> 2.0", only: :test, runtime: false},
+      {:excoveralls, "~> 0.10", only: :test, runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
 

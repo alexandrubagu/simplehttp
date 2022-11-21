@@ -16,9 +16,7 @@
 $ mix app.tree      
 
 simplehttp
-├── elixir
-└── logger
-    └── elixir
+└── elixir
 	   </code>
         </pre> 
       </td>
