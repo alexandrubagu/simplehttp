@@ -31,6 +31,7 @@ defmodule SimpleHttp do
   def request(method, url, args \\ []) do
     request = %Request{args: args} = create_request(method, url, args)
     {profile, args} = init_httpc(args)
+    args != [] && raise ArgumentError, message: "Invalid arguments: #{inspect(args)}"
     execute(%{request | args: args, profile: profile})
   end
 
@@ -104,7 +105,7 @@ defmodule SimpleHttp do
 
   defp add_headers_to_request(%Request{args: args} = request) do
     content_type_key = "Content-Type"
-    {headers, args} = pop_in(args[:headers])
+    {headers, args} = Keyword.pop(args, :headers, %{})
     {content_type, headers} = pop_in(headers[content_type_key])
 
     headers =
@@ -128,11 +129,7 @@ defmodule SimpleHttp do
         %Request{request | headers: headers}
       end
 
-    if headers do
-      %Request{request | args: Keyword.put(args, :headers, headers)}
-    else
-      %Request{request | args: args}
-    end
+    %Request{request | args: args}
   end
 
   @http_options MapSet.new([

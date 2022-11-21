@@ -72,6 +72,11 @@ defmodule SimpleHttpTest do
     assert response.body == "ok"
   end
 
+  test "simple get request with passing a bad option" do
+    assert_raise(ArgumentError, "Invalid arguments: [bad_option: 123]",
+      fn -> SimpleHttp.get("http://localhost:4000", bad_option: 123) end)
+  end
+
   test "get via request method" do
     assert {:ok, response} = SimpleHttp.request(:get, "http://localhost:4000")
     assert response.__struct__ == SimpleHttp.Response
