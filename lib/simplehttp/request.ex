@@ -11,5 +11,6 @@ defmodule SimpleHttp.Request do
             body: nil,
             http_options: [],
             options: [],
-            global_options: []
+            profile: nil,
+            args: []
 end

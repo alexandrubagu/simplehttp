@@ -120,6 +120,32 @@ defmodule SimpleHttpTest do
            :httpc.get_options([:max_sessions, :verbose])
   end
 
+  test "post via request method using custom profile" do
+    assert {:ok, response} =
+             SimpleHttp.request(:post, "http://localhost:4000",
+               params: [
+                 title: "title is present here",
+                 message: "hello world!"
+               ],
+               headers: %{
+                 "Content-Type" => "application/x-www-form-urlencoded",
+                 "Authorization" => "Bearer hash"
+               },
+               timeout: 1000,
+               connect_timeout: 1000,
+               profile: :test,
+               max_sessions: 8
+             )
+
+    assert response.__struct__ == SimpleHttp.Response
+    assert response.body == "ok"
+    assert response.profile == :test
+    assert {:ok, [{:max_sessions, 8}, {:verbose, false}]} ==
+           :httpc.get_options([:max_sessions, :verbose], :test)
+    assert :ok == SimpleHttp.close(:test)
+    assert {:error, :not_found} == SimpleHttp.close(:test)
+  end
+
   test "simple put request" do
     assert {:ok, response} =
              SimpleHttp.put("http://localhost:4000/users/1",
@@ -138,7 +164,8 @@ defmodule SimpleHttpTest do
 
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
-    assert {:ok, [{:verbose, false}]} == :httpc.get_options([:verbose])
+    assert {:ok, [max_sessions: 5, verbose: false]} ==
+           :httpc.get_options([:max_sessions, :verbose])
   end
 
   test "put via request method" do

@@ -29,36 +29,42 @@ defmodule SimpleHttp do
 
   @spec request(atom(), String.t(), keyword()) :: {:error, any()} | {:ok, SimpleHttp.Response.t()}
   def request(method, url, args \\ []) do
-    request = create_request(method, url, args)
-    if request.global_options != [] do
-      case :httpc.set_options(request.global_options) do
-        :ok ->
-          :ok
-        {:error, err} ->
-          raise BadArgument, message: "Error setting global options: #{err}"
-      end
-    end
-    execute(request)
+    request = %Request{args: args} = create_request(method, url, args)
+    {profile, args} = init_httpc(args)
+    execute(%{request | args: args, profile: profile})
+  end
+
+  @doc "Stop the HTTP client profile"
+  @spec close(atom()) :: :ok | {:error, any()}
+  def close(profile) when is_atom(profile) and profile != nil do
+    :inets.stop(:httpc, profile)
   end
 
   @spec execute(SimpleHttp.Request.t()) :: {:error, any()} | {:ok, SimpleHttp.Response.t()}
   defp execute(%Request{} = req) do
     params = req.body && {req.url, req.headers, req.content_type, req.body} || {req.url, req.headers}
 
-    httpc_response = :httpc.request(req.method, params, req.http_options, req.options)
+    httpc_response =
+      case req.profile do
+        :inets ->
+          :httpc.request(req.method, params, req.http_options, req.options)
+        profile ->
+          :httpc.request(req.method, params, req.http_options, req.options, profile)
+      end
 
     case httpc_response do
       {:ok, {{_, status, _}, headers, body}} ->
         response = %Response{
           status: status,
           headers: headers,
-          body: cast_body(body)
+          body: cast_body(body),
+          profile: req.profile
         }
 
         {:ok, response}
 
-      {:ok, :saved_to_file} = response ->
-        response
+      {:ok, :saved_to_file} ->
+        {:ok, %Response{status: 200, body: :saved_to_file, profile: req.profile}}
 
       {:error, error} ->
         {:error, error}
@@ -70,22 +76,21 @@ defmodule SimpleHttp do
   defp cast_body(_body), do: raise(BadArgument)
 
   defp create_request(method, url, args) do
-    %Request{}
+    %Request{args: args}
     |> add_method_to_request(method)
-    |> add_url_to_request(url, args)
-    |> add_headers_to_request(args)
-    |> add_global_options(args)
-    |> add_http_options_to_request(args)
-    |> add_options_to_request(args)
-    |> add_body_or_params_to_request(args)
-    |> debug?(args)
+    |> add_url_to_request(url)
+    |> add_headers_to_request()
+    |> add_http_options_to_request()
+    |> add_options_to_request()
+    |> add_body_or_params_to_request()
+    |> debug?()
   end
 
   defp add_method_to_request(%Request{} = request, method), do: %{request | method: method}
 
-  defp add_url_to_request(%Request{} = request, url, args) do
+  defp add_url_to_request(%Request{args: args} = request, url) do
     String.valid?(url) || raise BadArgument, message: "URL must be a string"
-    query_params = Keyword.get(args, :query_params)
+    {query_params, args} = Keyword.pop(args, :query_params)
 
     url =
       if is_map(query_params) || Keyword.keyword?(query_params) do
@@ -94,92 +99,126 @@ defmodule SimpleHttp do
         url
       end
 
-    %{request | url: cstr(url)}
+    %Request{request | url: cstr(url), args: args}
   end
 
-  defp add_headers_to_request(%Request{} = request, args) do
+  defp add_headers_to_request(%Request{args: args} = request) do
     content_type_key = "Content-Type"
-    {content_type, headers} = pop_in(args[:headers][content_type_key])
+    {headers, args} = pop_in(args[:headers])
+    {content_type, headers} = pop_in(headers[content_type_key])
 
     headers =
-      headers
-      |> Keyword.get(:headers, %{})
-      |> Enum.map(fn {x,y} -> {to_charlist(x), to_charlist(y)} end)
-
-    request =
-      case String.valid?(content_type) do
-        true ->
-          %{request | content_type: to_charlist(content_type)}
-
-        false ->
-          request
+      if headers do
+        Enum.map(headers, fn {x,y} -> {to_charlist(x), y} end)
+      else
+        %{}
       end
 
-    case Enum.empty?(headers) do
-      true ->
+    request =
+      if String.valid?(content_type) do
+        %{request | content_type: to_charlist(content_type)}
+      else
         request
+      end
 
-      false ->
-        %{request | headers: headers}
+    request =
+      if Enum.empty?(headers) do
+        request
+      else
+        %Request{request | headers: headers}
+      end
+
+    if headers do
+      %Request{request | args: Keyword.put(args, :headers, headers)}
+    else
+      %Request{request | args: args}
     end
   end
 
-  defp add_http_options_to_request(%Request{} = request, args) do
-    keys = [
-      :timeout, :connect_timeout, :autoredirect,
-      :ssl, :essl, :proxy_auth, :version, :relaxed
-    ]
-    http_options = filter_options(keys, args)
+  @http_options MapSet.new([
+    :timeout, :connect_timeout, :autoredirect,
+    :ssl, :essl, :proxy_auth, :version, :relaxed
+  ])
+  defp add_http_options_to_request(%Request{args: args} = request) do
+    {http_options, args} = filter_options(@http_options, args)
 
-    %{request | http_options: http_options}
+    %Request{request | http_options: http_options, args: args}
   end
 
-  defp add_options_to_request(%Request{} = request, args) do
-    keys = [
-      :sync, :stream, :body_format, :full_result, :headers_as_is,
-      :socket_opts, :receiver, :ipv6_host_with_brackets
-    ]
-    options = filter_options(keys, args)
+  @req_options MapSet.new([
+    :sync, :stream, :body_format, :full_result, :headers_as_is,
+    :socket_opts, :receiver, :ipv6_host_with_brackets
+  ])
+  defp add_options_to_request(%Request{args: args} = request) do
+    {options, args} = filter_options(@req_options, args)
 
-    %{request | options: options}
+    %Request{request | options: options, args: args}
   end
 
-  defp add_global_options(%Request{} = request, args) do
-    keys = [
-      :proxy,                 :https_proxy,           :max_sessions,
-      :max_keep_alive_length, :keep_alive_timeout,    :max_pipeline_length,
-      :pipeline_timeout,      :cookies,               :ipfamily,
-      :ip,                    :port,                  :socket_opts,
-      :verbose,               :unix_socket
-    ]
-    options = filter_options(keys, args)
+  @global_options MapSet.new([
+    :proxy,                 :https_proxy,           :max_sessions,
+    :max_keep_alive_length, :keep_alive_timeout,    :max_pipeline_length,
+    :pipeline_timeout,      :cookies,               :ipfamily,
+    :ip,                    :port,                  :socket_opts,
+    :verbose,               :unix_socket
+  ])
+  defp init_httpc(args) do
+    {options, args} = filter_options(@global_options, args)
+    {profile, args} = Keyword.pop(args, :profile)
 
-    %{request | global_options: options}
-  end
+    res = profile && :inets.start(:httpc, [profile: profile]) || :inets.start()
 
-  defp add_body_or_params_to_request(%Request{} = request, args) do
-    with body <- Keyword.get(args, :body, nil),
-         params <- Keyword.get(args, :params, nil) do
-      if body do
-        %{request | body: body}
-      else
-        query =
-          if params do
-            params
-            |> URI.encode_query()
-            |> to_charlist
-          else
-            nil
-          end
-
-        %{request | body: query}
+    pid =
+      case res do
+        {:ok, pid} ->
+          pid
+        {:error, {:already_started, pid}} ->
+          pid
+        {:error, error} ->
+          raise RuntimeError, message: "Cannot start httpc: #{inspect(error)}"
       end
+
+    if options != [] do
+      case (profile && :httpc.set_options(options, pid) || :httpc.set_options(options)) do
+        :ok ->
+          :ok
+        {:error, err} ->
+          raise BadArgument, message:
+            "Error setting httpc options #{inspect(options)}: #{inspect(err)}"
+      end
+    end
+
+    {profile || :inets, args}
+  end
+
+  defp add_body_or_params_to_request(%Request{args: args} = request) do
+    case Keyword.pop(args, :body) do
+      {nil, _} ->
+        case Keyword.pop(args, :params) do
+          {nil, _} ->
+            request
+          {params, args} ->
+            query =
+              params
+              |> URI.encode_query()
+              |> to_charlist
+            %Request{request | body: query, args: args}
+        end
+      {body, args} ->
+        %Request{request | body: body, args: args}
     end
   end
 
   defp filter_options(keys, args) do
-    Enum.map(keys, &{&1, option_value(&1, args[&1])})
-    |> Enum.filter(fn {_,v} -> v != nil end)
+    {opts, args} =
+      Enum.split_with(args, fn {k,_} -> MapSet.member?(keys, k) end)
+
+    options =
+      opts
+      |> Enum.map(fn {k, v} -> {k, option_value(k, v)} end)
+      |> Enum.filter(fn {_, v} -> v != nil end)
+
+    {options, args}
   end
 
   defp option_value(_, nil),                   do: nil
@@ -197,7 +236,7 @@ defmodule SimpleHttp do
   defp list_cstr(v) when is_list(v),           do: for i <- v, do: cstr(i)
   defp list_cstr(v),                           do: cstr(v)
 
-  defp debug?(%Request{} = request, args) do
+  defp debug?(%Request{args: args} = request) do
     case Keyword.get(args, :debug) do
       nil -> request
       _ -> IO.inspect(request)

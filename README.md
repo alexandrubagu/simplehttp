@@ -129,7 +129,7 @@ GET Request with query params
 
 Download a file using a GET request
 ```elixir
-{:ok, :saved_to_file} = SimpleHttp.get "https://jsonplaceholder.typicode.com/posts", [
+{:ok, %Response{body: :saved_to_file}} = SimpleHttp.get "https://jsonplaceholder.typicode.com/posts", [
   ssl: [verify: :verify_none], headers: %{"User-Agent" => "Mozilla"},
   stream: "/tmp/posts.xml",
   timeout: 5000
@@ -167,3 +167,13 @@ POST with params
 ]
 ```
 
+Run a request in a custom HTTP profile with custom options
+```elixir
+{:ok, response} = SimpleHttp.get "https://jsonplaceholder.typicode.com/posts", [
+  ssl: [verify: :verify_none], headers: %{"User-Agent" => "Mozilla"},
+  timeout: 5000,
+  profile: :test,
+  verbose: :verbose
+]
+:ok = SimpleHttp.close(response.profile)
+```
