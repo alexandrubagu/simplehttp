@@ -11,20 +11,15 @@
     </tr>
     <tr>
       <td valign="top">
-	<pre class="vicinity rich-diff-level-zero">
-	   <code class="rich-diff-level-one">
-$ mix app.tree      
-
+        <pre class="vicinity rich-diff-level-zero">
+$ mix app.tree
 simplehttp
 └── elixir
-	   </code>
-        </pre> 
+	    </pre>
       </td>
       <td valign="top">
-	<pre class="vicinity rich-diff-level-zero">
-	   <code class="rich-diff-level-one">
-$ mix app.tree      
-
+        <pre class="vicinity rich-diff-level-zero">
+$ mix app.tree
 httpotion
 ├── elixir
 ├── ssl
@@ -33,14 +28,11 @@ httpotion
 │       ├── asn1
 │       └── crypto
 └── ibrowse
-	   </code>
-        </pre> 
+	    </pre>
       </td>
       <td valign="top">
-	<pre class="vicinity rich-diff-level-zero">
-	   <code class="rich-diff-level-one">
-$ mix app.tree      
-
+        <pre class="vicinity rich-diff-level-zero">
+$ mix app.tree
 httpoison
 ├── elixir
 └── hackney
@@ -58,8 +50,7 @@ httpoison
     ├── ssl_verify_fun
     │   └── ssl
     └── metrics
-	   </code>
-        </pre> 
+	    </pre>
       </td>
     </tr>
   </tbody>
