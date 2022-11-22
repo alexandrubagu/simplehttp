@@ -11,20 +11,15 @@
     </tr>
     <tr>
       <td valign="top">
-	<pre class="vicinity rich-diff-level-zero">
-	   <code class="rich-diff-level-one">
-$ mix app.tree      
-
+        <pre class="vicinity rich-diff-level-zero">
+$ mix app.tree
 simplehttp
 └── elixir
-	   </code>
-        </pre> 
+	    </pre>
       </td>
       <td valign="top">
-	<pre class="vicinity rich-diff-level-zero">
-	   <code class="rich-diff-level-one">
-$ mix app.tree      
-
+        <pre class="vicinity rich-diff-level-zero">
+$ mix app.tree
 httpotion
 ├── elixir
 ├── ssl
@@ -33,14 +28,11 @@ httpotion
 │       ├── asn1
 │       └── crypto
 └── ibrowse
-	   </code>
-        </pre> 
+	    </pre>
       </td>
       <td valign="top">
-	<pre class="vicinity rich-diff-level-zero">
-	   <code class="rich-diff-level-one">
-$ mix app.tree      
-
+        <pre class="vicinity rich-diff-level-zero">
+$ mix app.tree
 httpoison
 ├── elixir
 └── hackney
@@ -58,8 +50,7 @@ httpoison
     ├── ssl_verify_fun
     │   └── ssl
     └── metrics
-	   </code>
-        </pre> 
+	    </pre>
       </td>
     </tr>
   </tbody>
@@ -115,6 +106,25 @@ IO.inspect response
   status: 200
 }}
 ```
+
+Use `headers_format: :binary` option to return headers as strings:
+```elixir
+SimpleHttp.get "http://jsonplaceholder.typicode.com/posts/1", headers_format: :binary |> IO.inspect
+
+{:ok,
+%SimpleHttp.Response{
+  body: "{ ... }",
+  headers: [
+    {"cache-control", "public, max-age=14400"},
+    {"connection", "keep-alive"},
+    {"date", "Mon, 22 Oct 2018 07:02:48 GMT"},
+    ...
+  ],
+  status: 200
+}}
+```
+
+
 
 GET Request with query params
 ```elixir
@@ -173,5 +183,5 @@ Run a request in a custom HTTP profile with custom options
   profile: :test,
   verbose: :verbose
 ]
-:ok = SimpleHttp.close(response.profile)
+:ok = SimpleHttp.close(response)  # Stop the HTTPC :test profile
 ```

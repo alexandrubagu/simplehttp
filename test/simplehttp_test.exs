@@ -153,6 +153,7 @@ defmodule SimpleHttpTest do
              :httpc.get_options([:max_sessions, :verbose], :test)
 
     assert :ok == SimpleHttp.close(:test)
+    assert {:error, :not_found} == SimpleHttp.close(response)
     assert {:error, :not_found} == SimpleHttp.close(:test)
   end
 
