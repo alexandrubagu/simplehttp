@@ -164,5 +164,5 @@ Run a request in a custom HTTP profile with custom options
   profile: :test,
   verbose: :verbose
 ]
-:ok = SimpleHttp.close(response.profile)
+:ok = SimpleHttp.close(response)  # Stop the HTTPC :test profile
 ```

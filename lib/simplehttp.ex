@@ -39,10 +39,14 @@ defmodule SimpleHttp do
   end
 
   @doc "Stop the HTTP client profile"
-  @spec close(atom()) :: :ok | {:error, any()}
-  def close(profile) when is_atom(profile) and profile != nil do
-    :inets.stop(:httpc, profile)
-  end
+  @spec close(atom() | Response.t() | nil) :: :ok | {:error, any()}
+  def close(nil), do: :ok
+
+  def close(:inets),
+    do: raise(ArgumentError, message: "To stop default profile use :inets.stop()")
+
+  def close(profile) when is_atom(profile), do: :inets.stop(:httpc, profile)
+  def close(%Response{profile: profile}), do: close(profile)
 
   @spec execute(SimpleHttp.Request.t()) :: {:error, any()} | {:ok, SimpleHttp.Response.t()}
   defp execute(%Request{} = req) do
