@@ -16,7 +16,9 @@
 $ mix app.tree      
 
 simplehttp
-└── elixir
+├── elixir
+└── logger
+    └── elixir
 	   </code>
         </pre> 
       </td>
@@ -125,15 +127,6 @@ GET Request with query params
 ]
 ```
 
-Download a file using a GET request
-```elixir
-{:ok, %Response{body: :saved_to_file}} = SimpleHttp.get "https://jsonplaceholder.typicode.com/posts", [
-  ssl: [verify: :verify_none], headers: %{"User-Agent" => "Mozilla"},
-  stream: "/tmp/posts.xml",
-  timeout: 5000
-]
-```
-
 POST with JSON
 ```elixir
 {:ok, response} = SimpleHttp.post "http://jsonplaceholder.typicode.com/posts", [
@@ -165,13 +158,3 @@ POST with params
 ]
 ```
 
-Run a request in a custom HTTP profile with custom options
-```elixir
-{:ok, response} = SimpleHttp.get "https://jsonplaceholder.typicode.com/posts", [
-  ssl: [verify: :verify_none], headers: %{"User-Agent" => "Mozilla"},
-  timeout: 5000,
-  profile: :test,
-  verbose: :verbose
-]
-:ok = SimpleHttp.close(response.profile)
-```
