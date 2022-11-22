@@ -50,6 +50,7 @@ defmodule SimpleHttpTest do
       import Supervisor.Spec, warn: false
 
       Application.ensure_all_started(:cowboy_telemetry)
+
       children = [
         %{id: __MODULE__, start: {Test.Server, :start_link, []}}
       ]
@@ -73,8 +74,9 @@ defmodule SimpleHttpTest do
   end
 
   test "simple get request with passing a bad option" do
-    assert_raise(ArgumentError, "Invalid arguments: [bad_option: 123]",
-      fn -> SimpleHttp.get("http://localhost:4000", bad_option: 123) end)
+    assert_raise(ArgumentError, "Invalid arguments: [bad_option: 123]", fn ->
+      SimpleHttp.get("http://localhost:4000", bad_option: 123)
+    end)
   end
 
   test "get via request method" do
@@ -121,8 +123,9 @@ defmodule SimpleHttpTest do
 
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
+
     assert {:ok, [{:max_sessions, 5}, {:verbose, :verbose}]} ==
-           :httpc.get_options([:max_sessions, :verbose])
+             :httpc.get_options([:max_sessions, :verbose])
   end
 
   test "post via request method using custom profile" do
@@ -145,8 +148,10 @@ defmodule SimpleHttpTest do
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
     assert response.profile == :test
+
     assert {:ok, [{:max_sessions, 8}, {:verbose, false}]} ==
-           :httpc.get_options([:max_sessions, :verbose], :test)
+             :httpc.get_options([:max_sessions, :verbose], :test)
+
     assert :ok == SimpleHttp.close(:test)
     assert {:error, :not_found} == SimpleHttp.close(:test)
   end
@@ -169,8 +174,9 @@ defmodule SimpleHttpTest do
 
     assert response.__struct__ == SimpleHttp.Response
     assert response.body == "ok"
+
     assert {:ok, [max_sessions: 5, verbose: false]} ==
-           :httpc.get_options([:max_sessions, :verbose])
+             :httpc.get_options([:max_sessions, :verbose])
   end
 
   test "put via request method" do
