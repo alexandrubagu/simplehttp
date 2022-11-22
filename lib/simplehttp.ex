@@ -43,12 +43,14 @@ defmodule SimpleHttp do
 
   @spec execute(SimpleHttp.Request.t()) :: {:error, any()} | {:ok, SimpleHttp.Response.t()}
   defp execute(%Request{} = req) do
-    params = req.body && {req.url, req.headers, req.content_type, req.body} || {req.url, req.headers}
+    params =
+      (req.body && {req.url, req.headers, req.content_type, req.body}) || {req.url, req.headers}
 
     httpc_response =
       case req.profile do
         :inets ->
           :httpc.request(req.method, params, req.http_options, req.options)
+
         profile ->
           :httpc.request(req.method, params, req.http_options, req.options, profile)
       end
@@ -95,7 +97,7 @@ defmodule SimpleHttp do
 
     url =
       if is_map(query_params) || Keyword.keyword?(query_params) do
-        (url <> "?" <> URI.encode_query(query_params))
+        url <> "?" <> URI.encode_query(query_params)
       else
         url
       end
@@ -110,7 +112,7 @@ defmodule SimpleHttp do
 
     headers =
       if headers do
-        Enum.map(headers, fn {x,y} -> {to_charlist(x), y} end)
+        Enum.map(headers, fn {x, y} -> {to_charlist(x), y} end)
       else
         %{}
       end
@@ -133,9 +135,15 @@ defmodule SimpleHttp do
   end
 
   @http_options MapSet.new([
-    :timeout, :connect_timeout, :autoredirect,
-    :ssl, :essl, :proxy_auth, :version, :relaxed
-  ])
+                  :timeout,
+                  :connect_timeout,
+                  :autoredirect,
+                  :ssl,
+                  :essl,
+                  :proxy_auth,
+                  :version,
+                  :relaxed
+                ])
   defp add_http_options_to_request(%Request{args: args} = request) do
     {http_options, args} = filter_options(@http_options, args)
 
@@ -143,9 +151,15 @@ defmodule SimpleHttp do
   end
 
   @req_options MapSet.new([
-    :sync, :stream, :body_format, :full_result, :headers_as_is,
-    :socket_opts, :receiver, :ipv6_host_with_brackets
-  ])
+                 :sync,
+                 :stream,
+                 :body_format,
+                 :full_result,
+                 :headers_as_is,
+                 :socket_opts,
+                 :receiver,
+                 :ipv6_host_with_brackets
+               ])
   defp add_options_to_request(%Request{args: args} = request) do
     {options, args} = filter_options(@req_options, args)
 
@@ -153,35 +167,47 @@ defmodule SimpleHttp do
   end
 
   @global_options MapSet.new([
-    :proxy,                 :https_proxy,           :max_sessions,
-    :max_keep_alive_length, :keep_alive_timeout,    :max_pipeline_length,
-    :pipeline_timeout,      :cookies,               :ipfamily,
-    :ip,                    :port,                  :socket_opts,
-    :verbose,               :unix_socket
-  ])
+                    :proxy,
+                    :https_proxy,
+                    :max_sessions,
+                    :max_keep_alive_length,
+                    :keep_alive_timeout,
+                    :max_pipeline_length,
+                    :pipeline_timeout,
+                    :cookies,
+                    :ipfamily,
+                    :ip,
+                    :port,
+                    :socket_opts,
+                    :verbose,
+                    :unix_socket
+                  ])
   defp init_httpc(args) do
     {options, args} = filter_options(@global_options, args)
     {profile, args} = Keyword.pop(args, :profile)
 
-    res = profile && :inets.start(:httpc, [profile: profile]) || :inets.start()
+    res = (profile && :inets.start(:httpc, profile: profile)) || :inets.start()
 
     pid =
       case res do
         {:ok, pid} ->
           pid
+
         {:error, {:already_started, pid}} ->
           pid
+
         {:error, error} ->
           raise RuntimeError, message: "Cannot start httpc: #{inspect(error)}"
       end
 
     if options != [] do
-      case (profile && :httpc.set_options(options, pid) || :httpc.set_options(options)) do
+      case (profile && :httpc.set_options(options, pid)) || :httpc.set_options(options) do
         :ok ->
           :ok
+
         {:error, err} ->
-          raise BadArgument, message:
-            "Error setting httpc options #{inspect(options)}: #{inspect(err)}"
+          raise BadArgument,
+            message: "Error setting httpc options #{inspect(options)}: #{inspect(err)}"
       end
     end
 
@@ -194,21 +220,23 @@ defmodule SimpleHttp do
         case Keyword.pop(args, :params) do
           {nil, _} ->
             request
+
           {params, args} ->
             query =
               params
               |> URI.encode_query()
               |> to_charlist
+
             %Request{request | body: query, args: args}
         end
+
       {body, args} ->
         %Request{request | body: body, args: args}
     end
   end
 
   defp filter_options(keys, args) do
-    {opts, args} =
-      Enum.split_with(args, fn {k,_} -> MapSet.member?(keys, k) end)
+    {opts, args} = Enum.split_with(args, fn {k, _} -> MapSet.member?(keys, k) end)
 
     options =
       opts
@@ -218,20 +246,20 @@ defmodule SimpleHttp do
     {options, args}
   end
 
-  defp option_value(_, nil),                   do: nil
-  defp option_value(:stream, v),               do: cstr(v)
-  defp option_value(:proxy_auth, {u,p}),       do: {cstr(u), cstr(p)}
-  defp option_value(:body_format, v),          do: cstr(v)
-  defp option_value(:proxy, {{h,p},np}),       do: {{cstr(h),p},list_cstr(np)}
-  defp option_value(:https_proxy, {{h,p},np}), do: {{cstr(h),p},list_cstr(np)}
-  defp option_value(:unix_socket, v),          do: cstr(v)
-  defp option_value(_, v),                     do: v
+  defp option_value(_, nil), do: nil
+  defp option_value(:stream, v), do: cstr(v)
+  defp option_value(:proxy_auth, {u, p}), do: {cstr(u), cstr(p)}
+  defp option_value(:body_format, v), do: cstr(v)
+  defp option_value(:proxy, {{h, p}, np}), do: {{cstr(h), p}, list_cstr(np)}
+  defp option_value(:https_proxy, {{h, p}, np}), do: {{cstr(h), p}, list_cstr(np)}
+  defp option_value(:unix_socket, v), do: cstr(v)
+  defp option_value(_, v), do: v
 
-  defp cstr(v) when is_binary(v),              do: String.to_charlist(v)
-  defp cstr(v),                                do: v
+  defp cstr(v) when is_binary(v), do: String.to_charlist(v)
+  defp cstr(v), do: v
 
-  defp list_cstr(v) when is_list(v),           do: for i <- v, do: cstr(i)
-  defp list_cstr(v),                           do: cstr(v)
+  defp list_cstr(v) when is_list(v), do: for(i <- v, do: cstr(i))
+  defp list_cstr(v), do: cstr(v)
 
   defp debug?(%Request{args: args} = request) do
     case Keyword.get(args, :debug) do

@@ -1,2 +1,3 @@
-ExUnit.configure seed: 0  # Run tests in deterministic order
+# Run tests in deterministic order
+ExUnit.configure(seed: 0)
 ExUnit.start()
