@@ -1,4 +1,7 @@
 defmodule SimpleHttp do
+  @moduledoc """
+  Implements a simple HTTP client that uses inets application included in the OTP.
+  """
   alias SimpleHttp.Request
   alias SimpleHttp.Response
   alias SimpleHttp.Exception.BadArgument
@@ -200,18 +203,20 @@ defmodule SimpleHttp do
           raise RuntimeError, message: "Cannot start httpc: #{inspect(error)}"
       end
 
-    if options != [] do
-      case (profile && :httpc.set_options(options, pid)) || :httpc.set_options(options) do
-        :ok ->
-          :ok
-
-        {:error, err} ->
-          raise BadArgument,
-            message: "Error setting httpc options #{inspect(options)}: #{inspect(err)}"
-      end
-    end
+    options != [] && set_httpc_options(profile, pid, options)
 
     {profile || :inets, args}
+  end
+
+  defp set_httpc_options(profile, pid, options) do
+    case (profile && :httpc.set_options(options, pid)) || :httpc.set_options(options) do
+      :ok ->
+        :ok
+
+      {:error, err} ->
+        raise BadArgument,
+          message: "Error setting httpc options #{inspect(options)}: #{inspect(err)}"
+    end
   end
 
   defp add_body_or_params_to_request(%Request{args: args} = request) do
@@ -264,7 +269,7 @@ defmodule SimpleHttp do
   defp debug?(%Request{args: args} = request) do
     case Keyword.get(args, :debug) do
       nil -> request
-      _ -> IO.inspect(request)
+      _ -> IO.puts("Request: #{inspect(request, pretty: true)}")
     end
   end
 end
