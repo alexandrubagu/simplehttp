@@ -30,9 +30,9 @@ defmodule SimpleHttp.Mixfile do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:plug_cowboy, "~> 2.0", only: :test, runtime: false},
-      {:excoveralls, "~> 0.10", only: :test, runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:plug_cowboy, "~> 2.6", only: :test, runtime: false},
+      {:excoveralls, "~> 0.15", only: :test, runtime: false},
+      {:dialyxir, "~> 1.2", only: [:dev], runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
