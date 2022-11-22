@@ -66,7 +66,7 @@ defmodule SimpleHttp do
       {:ok, {{_, status, _}, headers, body}} ->
         response = %Response{
           status: status,
-          headers: headers,
+          headers: format_headers(headers, req.headers_format),
           body: cast_body(body),
           profile: req.profile
         }
@@ -169,8 +169,9 @@ defmodule SimpleHttp do
                ])
   defp add_options_to_request(%Request{args: args} = request) do
     {options, args} = filter_options(@req_options, args)
+    {format, args} = Keyword.pop(args, :headers_format)
 
-    %Request{request | options: options, args: args}
+    %Request{request | options: options, args: args, headers_format: format}
   end
 
   @global_options MapSet.new([
@@ -269,6 +270,11 @@ defmodule SimpleHttp do
 
   defp list_cstr(v) when is_list(v), do: for(i <- v, do: cstr(i))
   defp list_cstr(v), do: cstr(v)
+
+  defp format_headers(headers, :binary),
+    do: for({k, v} <- headers, do: {to_string(k), to_string(v)})
+
+  defp format_headers(headers, _), do: headers
 
   defp debug?(%Request{args: args} = request) do
     case Keyword.get(args, :debug) do

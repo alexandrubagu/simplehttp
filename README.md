@@ -107,6 +107,25 @@ IO.inspect response
 }}
 ```
 
+Use `headers_format: :binary` option to return headers as strings:
+```elixir
+SimpleHttp.get "http://jsonplaceholder.typicode.com/posts/1", headers_format: :binary |> IO.inspect
+
+{:ok,
+%SimpleHttp.Response{
+  body: "{ ... }",
+  headers: [
+    {"cache-control", "public, max-age=14400"},
+    {"connection", "keep-alive"},
+    {"date", "Mon, 22 Oct 2018 07:02:48 GMT"},
+    ...
+  ],
+  status: 200
+}}
+```
+
+
+
 GET Request with query params
 ```elixir
 {:ok, response} = SimpleHttp.get "http://jsonplaceholder.typicode.com/posts/1", [
