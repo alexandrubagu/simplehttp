@@ -34,7 +34,8 @@ defmodule SimpleHttp do
   def request(method, url, args \\ []) do
     request = %Request{args: args} = create_request(method, url, args)
     {profile, args} = init_httpc(args)
-    args != [] && raise ArgumentError, message: "Invalid arguments: #{inspect(args)}"
+    {debug, args1} = Keyword.pop(args, :debug, nil)
+    args1 != [] && raise ArgumentError, message: "Invalid arguments: #{inspect(args1)}"
     execute(%{request | args: args, profile: profile})
   end
 
