@@ -34,7 +34,8 @@ defmodule SimpleHttp do
   def request(method, url, args \\ []) do
     request = %Request{args: args} = create_request(method, url, args)
     {profile, args} = init_httpc(args)
-    args != [] && raise ArgumentError, message: "Invalid arguments: #{inspect(args)}"
+    {debug, args1} = Keyword.pop(args, :debug, nil)
+    args1 != [] && raise ArgumentError, message: "Invalid arguments: #{inspect(args1)}"
     execute(%{request | args: args, profile: profile})
   end
 
@@ -125,7 +126,7 @@ defmodule SimpleHttp do
       end
 
     request =
-      if String.valid?(content_type) do
+      if content_type && String.valid?(content_type) do
         %{request | content_type: to_charlist(content_type)}
       else
         request
@@ -277,9 +278,7 @@ defmodule SimpleHttp do
   defp format_headers(headers, _), do: headers
 
   defp debug?(%Request{args: args} = request) do
-    case Keyword.get(args, :debug) do
-      nil -> request
-      _ -> IO.puts("Request: #{inspect(request, pretty: true)}")
-    end
+    Keyword.get(args, :debug) && IO.puts("Request: #{inspect(request, pretty: true)}")
+    request
   end
 end
