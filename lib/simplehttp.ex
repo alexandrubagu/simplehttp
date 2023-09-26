@@ -125,7 +125,7 @@ defmodule SimpleHttp do
       end
 
     request =
-      if String.valid?(content_type) do
+      if content_type && String.valid?(content_type) do
         %{request | content_type: to_charlist(content_type)}
       else
         request
