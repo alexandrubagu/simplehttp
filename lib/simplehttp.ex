@@ -277,9 +277,7 @@ defmodule SimpleHttp do
   defp format_headers(headers, _), do: headers
 
   defp debug?(%Request{args: args} = request) do
-    case Keyword.get(args, :debug) do
-      nil -> request
-      _ -> IO.puts("Request: #{inspect(request, pretty: true)}")
-    end
+    Keyword.get(args, :debug) && IO.puts("Request: #{inspect(request, pretty: true)}")
+    request
   end
 end
